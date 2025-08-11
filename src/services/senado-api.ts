@@ -102,16 +102,14 @@ export async function getSenadores(): Promise<Senador[]> {
         const currentLegislatureData: SenadoresResponse = await currentLegislatureResponse.json();
         const senadores = new Map(currentLegislatureData.ListaParlamentarEmExercicio.Parlamentares.Parlamentar.map(s => [s.IdentificacaoParlamentar.CodigoParlamentar, s]));
 
-        // Fetching senators from previous legislatures. Let's say from 50 to current.
-        // The senate was created in 1826. We'll fetch a few recent ones for performance.
-        const LATEST_LEGISLATURA = 57;
-        const EARLIEST_LEGISLATURA = 50;
-
-        for (let i = LATEST_LEGISLATURA; i >= EARLIEST_LEGISLATURA; i--) {
+        // The first legislature in the system is 1. We will fetch all legislatures up to the current one.
+        const LATEST_LEGISLATURA = 57; // This can be updated if needed.
+        
+        for (let i = 1; i <= LATEST_LEGISLATURA; i++) {
              const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/legislatura/${i}`);
              if (response.ok) {
                 const data: LegislaturaResponse = await response.json();
-                if (data.ListaParlamentarLegislatura.Parlamentares.Parlamentar) {
+                if (data.ListaParlamentarLegislatura.Parlamentares && data.ListaParlamentarLegislatura.Parlamentares.Parlamentar) {
                     data.ListaParlamentarLegislatura.Parlamentares.Parlamentar.forEach(senador => {
                         if (!senadores.has(senador.IdentificacaoParlamentar.CodigoParlamentar)) {
                             senadores.set(senador.IdentificacaoParlamentar.CodigoParlamentar, senador);

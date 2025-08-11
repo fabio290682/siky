@@ -50,6 +50,10 @@ export interface Mandato {
     MandatoMotivoAfastamento?: string;
 }
 
+interface OutrosMandatos {
+    Mandato: Mandato | Mandato[];
+}
+
 interface SenadorDetalhes {
     DetalheParlamentar: {
         Parlamentar: {
@@ -72,9 +76,7 @@ interface SenadorDetalhes {
                 Profissao?: string;
             };
             Mandato: Mandato;
-            OutrosMandatos: {
-                Mandato: Mandato[];
-            }
+            OutrosMandatos?: OutrosMandatos;
         };
     };
 }

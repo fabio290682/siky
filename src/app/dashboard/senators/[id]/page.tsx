@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getSenadorDetalhes, Mandato } from "@/services/senado-api";
-import { ArrowLeft, Briefcase, Building, Cake, Mail, User, ExternalLink, Landmark } from "lucide-react";
+import { ArrowLeft, Briefcase, Cake, Mail, User, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { format, differenceInYears } from 'date-fns';
 
@@ -58,7 +58,8 @@ export default async function SenatorDetailPage({ params }: { params: { id: stri
     
     const { Parlamentar: senator } = senatorData.DetalheParlamentar;
     const { IdentificacaoParlamentar: id, DadosBasicosParlamentar: basicData, Mandato: currentMandate, OutrosMandatos: otherMandates } = senator;
-    const currentLegislature = currentMandate.Exercicios.Exercicio.slice(-1)[0];
+    const otherMandatesList = Array.isArray(otherMandates?.Mandato) ? otherMandates.Mandato : (otherMandates?.Mandato ? [otherMandates.Mandato] : []);
+
 
     return (
         <div className="space-y-6">
@@ -114,7 +115,7 @@ export default async function SenatorDetailPage({ params }: { params: { id: stri
                         </CardHeader>
                         <CardContent className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <MandateCard mandato={currentMandate} />
-                            {otherMandates.Mandato.map(m => <MandateCard key={m.CodigoMandato} mandato={m} />)}
+                            {otherMandatesList.map(m => <MandateCard key={m.CodigoMandato} mandato={m} />)}
                         </CardContent>
                    </Card>
                 </CardContent>

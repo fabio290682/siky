@@ -102,12 +102,17 @@ export async function getSenadores(): Promise<Senador[]> {
         const currentLegislatureData: SenadoresResponse = await currentLegislatureResponse.json();
         const senadores = new Map(currentLegislatureData.ListaParlamentarEmExercicio.Parlamentares.Parlamentar.map(s => [s.IdentificacaoParlamentar.CodigoParlamentar, s]));
 
-        // The first legislature in the system is 1. We will fetch all legislatures up to the current one.
-        const LATEST_LEGISLATURA = 57; // This can be updated if needed.
-        
+        const LATEST_LEGISLATURA = 57;
+        const legislaturePromises = [];
+
         for (let i = 1; i <= LATEST_LEGISLATURA; i++) {
-             const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/legislatura/${i}`);
-             if (response.ok) {
+            legislaturePromises.push(fetchWithCache(`${API_BASE_URL}/senador/lista/legislatura/${i}`));
+        }
+
+        const responses = await Promise.all(legislaturePromises);
+
+        for (const response of responses) {
+            if (response.ok) {
                 const data: LegislaturaResponse = await response.json();
                 if (data.ListaParlamentarLegislatura.Parlamentares && data.ListaParlamentarLegislatura.Parlamentares.Parlamentar) {
                     data.ListaParlamentarLegislatura.Parlamentares.Parlamentar.forEach(senador => {
@@ -116,9 +121,9 @@ export async function getSenadores(): Promise<Senador[]> {
                         }
                     });
                 }
-             } else {
-                console.warn(`Não foi possível buscar senadores da legislatura ${i}`);
-             }
+            } else {
+                console.warn(`Não foi possível buscar senadores de uma das legislaturas.`);
+            }
         }
         
         return Array.from(senadores.values());

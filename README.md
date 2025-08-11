@@ -1,5 +1,11 @@
-# Firebase Studio
+# IntegraGov
 
-This is a NextJS starter in Firebase Studio.
+This is a Next.js application built with Firebase Studio, designed to provide a comprehensive platform for managing users, communications, and public data integrations.
 
-To get started, take a look at src/app/page.tsx.
+## Features
+
+- **User Management**: Authentication and role-based access control.
+- **Real-time Chat**: Secure messaging between users.
+- **Data Integration**: Views for conventions and parliamentary amendments from the Transparency Portal.
+- **AI Insights**: AI-powered summarization of parliamentary amendments.
+- **Service Health**: A status page to monitor service availability.

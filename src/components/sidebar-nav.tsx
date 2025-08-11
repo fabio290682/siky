@@ -31,6 +31,7 @@ const menuItems = [
   { href: "/dashboard/amendments", label: "Emendas", icon: FileText },
   { href: "/dashboard/special-amendments", label: "Emendas Especiais", icon: Star },
   { href: "/dashboard/parliamentarians", label: "Parlamentares", icon: Users },
+  { href: "/dashboard/senators", label: "Senadores", icon: Users },
   { href: "/dashboard/parties", label: "Partidos", icon: Building },
   { href: "/dashboard/investsus", label: "InvestSUS", icon: Briefcase },
   { href: "/dashboard/sismob", label: "SISMOB", icon: Building2 },

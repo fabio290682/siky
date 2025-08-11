@@ -3,8 +3,8 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'IntegraGov',
-  description: 'Sistema de gestão e integração com o Portal da Transparência.',
+  title: 'Kyodai Systems',
+  description: 'Tecnologia que conecta e transforma.',
 };
 
 export default function RootLayout({

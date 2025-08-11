@@ -95,42 +95,12 @@ async function fetchWithCache(url: string, options?: RequestInit) {
 
 export async function getSenadores(): Promise<Senador[]> {
     try {
-        const currentLegislatureResponse = await fetchWithCache(`${API_BASE_URL}/senador/lista/atual`);
-        if (!currentLegislatureResponse.ok) {
+        const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/atual`);
+        if (!response.ok) {
             throw new Error('Erro ao buscar senadores da legislatura atual');
         }
-        const currentLegislatureData: SenadoresResponse = await currentLegislatureResponse.json();
-        const senadores = new Map(currentLegislatureData.ListaParlamentarEmExercicio.Parlamentares.Parlamentar.map(s => [s.IdentificacaoParlamentar.CodigoParlamentar, s]));
-
-        const LATEST_LEGISLATURA = 57;
-        const legislaturePromises = [];
-
-        // Fetch all legislatures in parallel
-        for (let i = 1; i <= LATEST_LEGISLATURA; i++) {
-            legislaturePromises.push(fetchWithCache(`${API_BASE_URL}/senador/lista/legislatura/${i}`));
-        }
-
-        const responses = await Promise.all(legislaturePromises);
-
-        for (const response of responses) {
-            if (response.ok) {
-                const data: LegislaturaResponse = await response.json();
-                if (data.ListaParlamentarLegislatura.Parlamentares && data.ListaParlamentarLegislatura.Parlamentares.Parlamentar) {
-                    data.ListaParlamentarLegislatura.Parlamentares.Parlamentar.forEach(senador => {
-                        // Add only if not already in the map to avoid duplicates
-                        if (!senadores.has(senador.IdentificacaoParlamentar.CodigoParlamentar)) {
-                            senadores.set(senador.IdentificacaoParlamentar.CodigoParlamentar, senador);
-                        }
-                    });
-                }
-            } else {
-                // It's better to log a warning than to throw an error, so the app can still work with partial data.
-                console.warn(`Não foi possível buscar senadores de uma das legislaturas.`);
-            }
-        }
-        
-        return Array.from(senadores.values());
-
+        const data: SenadoresResponse = await response.json();
+        return data.ListaParlamentarEmExercicio.Parlamentares.Parlamentar;
     } catch (error) {
         console.error('Falha ao buscar dados dos senadores:', error);
         return [];

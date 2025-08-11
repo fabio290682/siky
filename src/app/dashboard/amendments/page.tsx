@@ -1,5 +1,3 @@
-"use client"
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AmendmentSummarizer } from "@/components/amendment-summarizer";
-import { amendments } from "@/lib/data";
+import { getEmendas, type Emenda } from "@/services/transparencia-api";
 import { Filter } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
@@ -33,7 +31,34 @@ const TableHeaderCell = ({ children }: { children: React.ReactNode }) => (
     </TableHead>
 );
 
-export default function AmendmentsPage() {
+const parseCurrency = (value: string) => {
+    return parseFloat(value.replace('R$ ', '').replace(/\./g, '').replace(',', '.'));
+}
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+    }).format(value);
+}
+
+const calculateAmendmentValues = (emenda: Emenda) => {
+    const valorEmpenhado = parseCurrency(emenda.valorEmpenhado);
+    const valorPago = parseCurrency(emenda.valorPago);
+
+    const valorLiberar = valorEmpenhado - valorPago;
+    const porcentagem = valorEmpenhado > 0 ? (valorPago / valorEmpenhado) * 100 : 0;
+
+    return {
+        valorLiberar: formatCurrency(valorLiberar),
+        porcentagem: porcentagem,
+    };
+}
+
+
+export default async function AmendmentsPage() {
+  const amendments = await getEmendas(2023);
+
   return (
     <div className="space-y-6">
       <AmendmentSummarizer />
@@ -65,33 +90,36 @@ export default function AmendmentsPage() {
             </TableHeader>
             <TableBody>
               {amendments.length > 0 ? (
-                amendments.map((amendment) => (
-                  <TableRow key={amendment.id}>
-                    <TableCell>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`https://portaldatransparencia.gov.br/emendas/detalhe?codigoEmenda=${amendment.id}&ordenarPor=data&direcao=asc`} target="_blank" rel="noopener noreferrer">
-                          Detalhar
-                        </Link>
-                      </Button>
-                    </TableCell>
-                    <TableCell>{amendment.ano}</TableCell>
-                    <TableCell>{amendment.tipo}</TableCell>
-                    <TableCell>{amendment.autor}</TableCell>
-                    <TableCell>{amendment.numero}</TableCell>
-                    <TableCell>{amendment.localidade}</TableCell>
-                    <TableCell>{amendment.funcao}</TableCell>
-                    <TableCell>{amendment.subfuncao}</TableCell>
-                    <TableCell>{amendment.valorEmpenhado}</TableCell>
-                    <TableCell>{amendment.valorPago}</TableCell>
-                    <TableCell>{amendment.valorLiberar}</TableCell>
-                    <TableCell>
-                        <div className="flex items-center gap-2">
-                            <Progress value={amendment.porcentagem} className="w-24" />
-                            <span>{amendment.porcentagem.toFixed(2)}%</span>
-                        </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                amendments.map((amendment) => {
+                    const { valorLiberar, porcentagem } = calculateAmendmentValues(amendment);
+                    return (
+                        <TableRow key={amendment.codigo}>
+                            <TableCell>
+                            <Button variant="outline" size="sm" asChild>
+                                <Link href={`https://portaldatransparencia.gov.br/emendas/detalhe?codigoEmenda=${amendment.codigo}&ordenarPor=data&direcao=asc`} target="_blank" rel="noopener noreferrer">
+                                Detalhar
+                                </Link>
+                            </Button>
+                            </TableCell>
+                            <TableCell>{amendment.ano}</TableCell>
+                            <TableCell>{amendment.tipo}</TableCell>
+                            <TableCell>{amendment.autor}</TableCell>
+                            <TableCell>{amendment.numero}</TableCell>
+                            <TableCell>{amendment.localidade}</TableCell>
+                            <TableCell>{amendment.funcao}</TableCell>
+                            <TableCell>{amendment.subfuncao}</TableCell>
+                            <TableCell>{amendment.valorEmpenhado}</TableCell>
+                            <TableCell>{amendment.valorPago}</TableCell>
+                            <TableCell>{valorLiberar}</TableCell>
+                            <TableCell>
+                                <div className="flex items-center gap-2">
+                                    <Progress value={porcentagem} className="w-24" />
+                                    <span>{porcentagem.toFixed(2)}%</span>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )
+                })
               ) : (
                 <TableRow>
                   <TableCell colSpan={12} className="h-24 text-center">

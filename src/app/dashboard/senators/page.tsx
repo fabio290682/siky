@@ -47,34 +47,42 @@ export default async function SenatorsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {senadores.map((senador) => (
-                            <TableRow key={senador.IdentificacaoParlamentar.CodigoParlamentar}>
-                                <TableCell>
-                                    <Avatar>
-                                        <AvatarImage src={senador.IdentificacaoParlamentar.UrlFotoParlamentar} alt={senador.IdentificacaoParlamentar.NomeParlamentar} />
-                                        <AvatarFallback>{senador.IdentificacaoParlamentar.NomeParlamentar.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                </TableCell>
-                                <TableCell className="font-medium">{senador.IdentificacaoParlamentar.NomeParlamentar}</TableCell>
-                                <TableCell>
-                                    <Badge variant="secondary">{senador.IdentificacaoParlamentar.SiglaPartidoParlamentar}</Badge>
-                                </TableCell>
-                                <TableCell>{senador.IdentificacaoParlamentar.UfParlamentar}</TableCell>
-                                <TableCell>
-                                    <a href={`mailto:${senador.IdentificacaoParlamentar.EmailParlamentar}`} className="hover:underline">
-                                        {senador.IdentificacaoParlamentar.EmailParlamentar}
-                                    </a>
-                                </TableCell>
-                                <TableCell>
-                                    <Button variant="outline" size="sm" asChild>
-                                        <Link href={`/dashboard/senators/${senador.IdentificacaoParlamentar.CodigoParlamentar}`}>
-                                            <ExternalLink className="mr-2 h-4 w-4" />
-                                            Ver Perfil
-                                        </Link>
-                                    </Button>
+                        {senadores && senadores.length > 0 ? (
+                            senadores.map((senador) => (
+                                <TableRow key={senador.IdentificacaoParlamentar.CodigoParlamentar}>
+                                    <TableCell>
+                                        <Avatar>
+                                            <AvatarImage src={senador.IdentificacaoParlamentar.UrlFotoParlamentar} alt={senador.IdentificacaoParlamentar.NomeParlamentar} />
+                                            <AvatarFallback>{senador.IdentificacaoParlamentar.NomeParlamentar.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                    </TableCell>
+                                    <TableCell className="font-medium">{senador.IdentificacaoParlamentar.NomeParlamentar}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="secondary">{senador.IdentificacaoParlamentar.SiglaPartidoParlamentar}</Badge>
+                                    </TableCell>
+                                    <TableCell>{senador.IdentificacaoParlamentar.UfParlamentar}</TableCell>
+                                    <TableCell>
+                                        <a href={`mailto:${senador.IdentificacaoParlamentar.EmailParlamentar}`} className="hover:underline">
+                                            {senador.IdentificacaoParlamentar.EmailParlamentar}
+                                        </a>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button variant="outline" size="sm" asChild>
+                                            <Link href={`/dashboard/senators/${senador.IdentificacaoParlamentar.CodigoParlamentar}`}>
+                                                <ExternalLink className="mr-2 h-4 w-4" />
+                                                Ver Perfil
+                                            </Link>
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={6} className="h-24 text-center">
+                                    Nenhum resultado encontrado.
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )}
                     </TableBody>
                 </Table>
             </CardContent>

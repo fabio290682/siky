@@ -95,9 +95,13 @@ async function fetchWithCache(url: string, options?: RequestInit) {
 
 export async function getSenadores(): Promise<Senador[]> {
     try {
-        const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/atual`);
+        const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/atual`, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
         if (!response.ok) {
-            throw new Error('Erro ao buscar senadores da legislatura atual');
+            throw new Error(`Erro ao buscar senadores: ${response.statusText}`);
         }
         const data: SenadoresResponse = await response.json();
         return data.ListaParlamentarEmExercicio.Parlamentares.Parlamentar;

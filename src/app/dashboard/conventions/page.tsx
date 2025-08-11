@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { conventions } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const getStatusVariant = (status: string) => {
   switch (status.toLowerCase()) {
@@ -72,8 +73,10 @@ export default function ConventionsPage() {
               <TableRow key={convention.numero}>
                 <TableCell>{convention.ano}</TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm">
-                    Detalhar
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`https://portaldatransparencia.gov.br/convenios/${convention.numero}?ordenarPor=data&direcao=desc`} target="_blank" rel="noopener noreferrer">
+                      Detalhar
+                    </Link>
                   </Button>
                 </TableCell>
                 <TableCell className="font-medium">{convention.numero}</TableCell>

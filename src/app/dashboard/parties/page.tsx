@@ -45,8 +45,8 @@ export default async function PartiesPage() {
                             <TableRow key={partido.id}>
                                 <TableCell className="font-medium">{partido.sigla}</TableCell>
                                 <TableCell>{partido.nome}</TableCell>
-                                <TableCell>{partido.status.lider.nome}</TableCell>
-                                <TableCell>{partido.status.lider.uf}</TableCell>
+                                <TableCell>{partido.status?.lider?.nome || 'Não informado'}</TableCell>
+                                <TableCell>{partido.status?.lider?.uf || 'Não informado'}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

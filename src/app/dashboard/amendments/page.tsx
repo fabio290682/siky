@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,7 +20,7 @@ import { AmendmentSummarizer } from "@/components/amendment-summarizer";
 import { amendments } from "@/lib/data";
 import { Filter } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { AmendmentDetailDialog } from "@/components/amendment-detail-dialog";
+import Link from "next/link";
 
 const TableHeaderCell = ({ children }: { children: React.ReactNode }) => (
     <TableHead>
@@ -69,9 +68,11 @@ export default function AmendmentsPage() {
                 amendments.map((amendment) => (
                   <TableRow key={amendment.id}>
                     <TableCell>
-                      <AmendmentDetailDialog amendmentId={amendment.id}>
-                        <Button variant="outline" size="sm">Detalhar</Button>
-                      </AmendmentDetailDialog>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`https://portaldatransparencia.gov.br/emendas/detalhe?codigoEmenda=${amendment.id}&ordenarPor=data&direcao=asc`} target="_blank" rel="noopener noreferrer">
+                          Detalhar
+                        </Link>
+                      </Button>
                     </TableCell>
                     <TableCell>{amendment.ano}</TableCell>
                     <TableCell>{amendment.tipo}</TableCell>

@@ -25,14 +25,6 @@ interface SenadoresResponse {
     };
 }
 
-interface LegislaturaResponse {
-    ListaParlamentarLegislatura: {
-        Parlamentares: {
-            Parlamentar: Senador[];
-        }
-    }
-}
-
 export interface Mandato {
     CodigoMandato: string;
     UfParlamentar: string;

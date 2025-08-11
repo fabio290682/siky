@@ -45,7 +45,7 @@ const KyodaiLogo = () => (
 );
 
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
@@ -55,14 +55,18 @@ export default function LoginPage() {
               <KyodaiLogo />
             </div>
             <CardTitle className="text-3xl font-bold tracking-tight">
-              Kyodai Systems
+              Criar uma conta
             </CardTitle>
             <CardDescription>
-              Tecnologia que conecta e transforma.
+              Insira seus dados para se cadastrar.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input id="name" type="text" placeholder="Seu Nome Completo" required />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -73,25 +77,21 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Senha</Label>
-                  <Link
-                    href="#"
-                    className="ml-auto inline-block text-sm underline"
-                  >
-                    Esqueceu sua senha?
-                  </Link>
-                </div>
+                <Label htmlFor="password">Senha</Label>
                 <Input id="password" type="password" required />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirmar Senha</Label>
+                <Input id="confirm-password" type="password" required />
+              </div>
               <Button asChild type="submit" className="w-full">
-                <Link href="/dashboard">Login</Link>
+                <Link href="/dashboard">Cadastrar</Link>
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Não tem uma conta?{' '}
-              <Link href="/register" className="underline">
-                Cadastre-se
+              Já tem uma conta?{' '}
+              <Link href="/" className="underline">
+                Login
               </Link>
             </div>
           </CardContent>

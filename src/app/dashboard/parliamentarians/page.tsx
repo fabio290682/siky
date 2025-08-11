@@ -67,7 +67,7 @@ export default async function ParliamentariansPage() {
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="outline" size="sm" asChild>
-                                        <Link href={`https://www.camara.leg.br/deputados/${deputado.id}`} target="_blank" rel="noopener noreferrer">
+                                        <Link href={`/dashboard/parliamentarians/${deputado.id}`}>
                                             <ExternalLink className="mr-2 h-4 w-4" />
                                             Ver Perfil
                                         </Link>

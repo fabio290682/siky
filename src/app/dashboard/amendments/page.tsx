@@ -37,17 +37,20 @@ const getStatusVariant = (status: string) => {
 };
 
 export default function AmendmentsPage() {
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('parlamentares');
 
   const filteredAmendments = amendments.filter(amendment => {
     if (filter === 'senadores') {
       return amendment.autor.toLowerCase().includes('senador');
     }
+    if (filter === 'parlamentares') {
+      return true;
+    }
     // The new filters do not have associated data, so they will show an empty table for now.
     if (['siop', 'sismob', 'investsus'].includes(filter)) {
         return false;
     }
-    return true; // 'all'
+    return true;
   });
 
   return (
@@ -63,7 +66,7 @@ export default function AmendmentsPage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2 mb-4">
-            <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>
+            <Button variant={filter === 'parlamentares' ? 'default' : 'outline'} onClick={() => setFilter('parlamentares')}>
               Parlamentares
             </Button>
             <Button variant={filter === 'senadores' ? 'default' : 'outline'} onClick={() => setFilter('senadores')}>

@@ -21,6 +21,7 @@ import { AmendmentSummarizer } from "@/components/amendment-summarizer";
 import { amendments } from "@/lib/data";
 import { Filter } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { AmendmentDetailDialog } from "@/components/amendment-detail-dialog";
 
 const TableHeaderCell = ({ children }: { children: React.ReactNode }) => (
     <TableHead>
@@ -68,7 +69,9 @@ export default function AmendmentsPage() {
                 amendments.map((amendment) => (
                   <TableRow key={amendment.id}>
                     <TableCell>
+                      <AmendmentDetailDialog amendmentId={amendment.id}>
                         <Button variant="outline" size="sm">Detalhar</Button>
+                      </AmendmentDetailDialog>
                     </TableCell>
                     <TableCell>{amendment.ano}</TableCell>
                     <TableCell>{amendment.tipo}</TableCell>

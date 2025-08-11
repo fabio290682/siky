@@ -27,6 +27,8 @@ export interface Emenda {
 
 export async function getEmendas(ano: number, pagina: number = 1): Promise<Emenda[]> {
     if (!API_KEY) {
+        // Return empty array if API key is not set, but log for debugging.
+        console.log("Retornando dados mocados de emendas pois a chave da API não foi configurada.");
         return [];
     }
 
@@ -56,6 +58,7 @@ export async function getEmendas(ano: number, pagina: number = 1): Promise<Emend
 
 export async function getEmendaDetail(codigo: string): Promise<Emenda | null> {
     if (!API_KEY) {
+        console.log(`Retornando null para getEmendaDetail pois a chave da API não foi configurada (código: ${codigo}).`);
         return null;
     }
 
@@ -69,6 +72,10 @@ export async function getEmendaDetail(codigo: string): Promise<Emenda | null> {
         });
 
         if (!response.ok) {
+             if (response.status === 404) {
+                console.warn(`Nenhuma emenda encontrada com o código: ${codigo}`);
+                return null;
+            }
             throw new Error(`Erro ao buscar detalhes da emenda: ${response.status}`);
         }
         

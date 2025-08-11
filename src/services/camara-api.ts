@@ -80,8 +80,8 @@ interface PartidoStatus {
     nome: string;
     sigla: string;
     uri: string;
-    status: {
-        lider: {
+    status?: {
+        lider?: {
             nome: string;
             siglaPartido: string;
             uriPartido: string;
@@ -150,10 +150,14 @@ interface FrentesResponse {
     links: Link[];
 }
 
+async function fetchWithCache(url: string, options?: RequestInit) {
+    return fetch(url, { ...options, next: { revalidate: 3600 } });
+}
+
 
 export async function getDeputados(): Promise<DeputadosResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/deputados?ordem=ASC&ordenarPor=nome`);
+    const response = await fetchWithCache(`${API_BASE_URL}/deputados?ordem=ASC&ordenarPor=nome`);
     if (!response.ok) {
       throw new Error('Erro ao buscar deputados');
     }
@@ -161,14 +165,13 @@ export async function getDeputados(): Promise<DeputadosResponse> {
     return data;
   } catch (error) {
     console.error('Falha ao buscar dados dos deputados:', error);
-    // Return empty response on error
     return { dados: [], links: [] };
   }
 }
 
 export async function getDeputadoDetalhes(id: number): Promise<DeputadoDetalhesResponse> {
     try {
-        const response = await fetch(`${API_BASE_URL}/deputados/${id}`);
+        const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}`);
         if (!response.ok) {
             throw new Error(`Erro ao buscar detalhes do deputado: ${id}`);
         }
@@ -176,8 +179,6 @@ export async function getDeputadoDetalhes(id: number): Promise<DeputadoDetalhesR
         return data;
     } catch (error) {
         console.error(`Falha ao buscar dados do deputado ${id}:`, error);
-        // Return a structure that matches the expected return type but indicates an error state or is empty.
-        // For simplicity, we'll throw the error up to be handled by the page component.
         throw error;
     }
 }
@@ -185,7 +186,7 @@ export async function getDeputadoDetalhes(id: number): Promise<DeputadoDetalhesR
 export async function getDeputadoDespesas(id: number): Promise<DespesasResponse> {
     try {
         const url = `${API_BASE_URL}/deputados/${id}/despesas?ordem=DESC&ordenarPor=ano&itens=100`;
-        const response = await fetch(url);
+        const response = await fetchWithCache(url);
         if (!response.ok) {
             throw new Error(`Erro ao buscar despesas do deputado: ${id}`);
         }
@@ -199,7 +200,7 @@ export async function getDeputadoDespesas(id: number): Promise<DespesasResponse>
 
 export async function getDeputadoOrgaos(id: number): Promise<OrgaosResponse> {
     try {
-        const response = await fetch(`${API_BASE_URL}/deputados/${id}/orgaos?ordem=ASC&ordenarPor=nomeOrgao`);
+        const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}/orgaos?ordem=ASC&ordenarPor=nomeOrgao`);
         if (!response.ok) {
             throw new Error(`Erro ao buscar órgãos do deputado: ${id}`);
         }
@@ -213,7 +214,7 @@ export async function getDeputadoOrgaos(id: number): Promise<OrgaosResponse> {
 
 export async function getDeputadoFrentes(id: number): Promise<FrentesResponse> {
     try {
-        const response = await fetch(`${API_BASE_URL}/deputados/${id}/frentes`);
+        const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}/frentes`);
         if (!response.ok) {
             throw new Error(`Erro ao buscar frentes do deputado: ${id}`);
         }
@@ -228,7 +229,7 @@ export async function getDeputadoFrentes(id: number): Promise<FrentesResponse> {
 
 export async function getPartidos(): Promise<PartidosResponse> {
     try {
-        const response = await fetch(`${API_BASE_URL}/partidos?itens=100&ordem=ASC&ordenarPor=sigla`);
+        const response = await fetchWithCache(`${API_BASE_URL}/partidos?itens=100&ordem=ASC&ordenarPor=sigla`);
         if (!response.ok) {
             throw new Error('Erro ao buscar partidos');
         }

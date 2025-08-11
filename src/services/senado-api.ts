@@ -81,10 +81,13 @@ interface SenadorDetalhes {
     };
 }
 
+async function fetchWithCache(url: string, options?: RequestInit) {
+    return fetch(url, { ...options, next: { revalidate: 3600 } });
+}
 
 export async function getSenadores(): Promise<Senador[]> {
     try {
-        const response = await fetch(`${API_BASE_URL}/senador/lista/atual`);
+        const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/atual`);
         if (!response.ok) {
             throw new Error('Erro ao buscar senadores');
         }
@@ -98,7 +101,7 @@ export async function getSenadores(): Promise<Senador[]> {
 
 export async function getSenadorDetalhes(id: string): Promise<SenadorDetalhes | null> {
     try {
-        const response = await fetch(`${API_BASE_URL}/senador/${id}`);
+        const response = await fetchWithCache(`${API_BASE_URL}/senador/${id}`);
         if (!response.ok) {
             throw new Error(`Erro ao buscar detalhes do senador: ${id}`);
         }

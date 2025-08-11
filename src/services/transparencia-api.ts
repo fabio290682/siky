@@ -25,9 +25,22 @@ export interface Emenda {
     valorRestoAPagar: string;
 }
 
+async function fetchWithCache(url: string, options?: RequestInit) {
+    if (!API_KEY) {
+        return new Response(JSON.stringify([]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
+    return fetch(url, { 
+        ...options, 
+        headers: { ...options?.headers, 'chave-api-dados': API_KEY },
+        next: { revalidate: 3600 } 
+    });
+}
+
 export async function getEmendas(ano: number, pagina: number = 1): Promise<Emenda[]> {
     if (!API_KEY) {
-        // Return empty array if API key is not set, but log for debugging.
         console.log("Retornando dados mocados de emendas pois a chave da API não foi configurada.");
         return [];
     }
@@ -37,11 +50,7 @@ export async function getEmendas(ano: number, pagina: number = 1): Promise<Emend
         url.searchParams.append('ano', ano.toString());
         url.searchParams.append('pagina', pagina.toString());
 
-        const response = await fetch(url.toString(), {
-            headers: {
-                'chave-api-dados': API_KEY,
-            },
-        });
+        const response = await fetchWithCache(url.toString());
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -65,11 +74,7 @@ export async function getEmendaDetail(codigo: string): Promise<Emenda | null> {
     try {
         const url = new URL(`${API_BASE_URL}/emendas/${codigo}`);
 
-        const response = await fetch(url.toString(), {
-            headers: {
-                'chave-api-dados': API_KEY,
-            },
-        });
+        const response = await fetchWithCache(url.toString());
 
         if (!response.ok) {
              if (response.status === 404) {

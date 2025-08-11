@@ -37,12 +37,8 @@ export default function IntegrationsPage() {
         <div className="space-y-4 p-4 border rounded-lg">
             <h3 className="font-semibold">Portal da Transparência</h3>
             <div className="space-y-2">
-                <Label htmlFor="transparencia-url">URL da API</Label>
-                <Input id="transparencia-url" placeholder="https://api.portaldatransparencia.gov.br" />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="transparencia-token">Chave da API</Label>
-                <Input id="transparencia-token" type="password" placeholder="Sua chave da API" />
+                <Label htmlFor="transparencia-api-key">Chave da API</Label>
+                <Input id="transparencia-api-key" type="password" placeholder="Sua chave da API do Portal da Transparência" />
             </div>
         </div>
         <Button>Salvar Configurações</Button>

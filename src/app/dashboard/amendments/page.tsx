@@ -1,4 +1,8 @@
+"use client"
+
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -33,6 +37,15 @@ const getStatusVariant = (status: string) => {
 };
 
 export default function AmendmentsPage() {
+  const [filter, setFilter] = useState('all');
+
+  const filteredAmendments = amendments.filter(amendment => {
+    if (filter === 'senadores') {
+      return amendment.autor.toLowerCase().includes('senador');
+    }
+    return true; // 'all'
+  });
+
   return (
     <div className="space-y-6">
       <AmendmentSummarizer />
@@ -45,6 +58,14 @@ export default function AmendmentsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex space-x-2 mb-4">
+            <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>
+              Parlamentares
+            </Button>
+            <Button variant={filter === 'senadores' ? 'default' : 'outline'} onClick={() => setFilter('senadores')}>
+              Senadores
+            </Button>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -56,7 +77,7 @@ export default function AmendmentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {amendments.map((amendment) => (
+              {filteredAmendments.map((amendment) => (
                 <TableRow key={amendment.id}>
                   <TableCell className="font-medium">{amendment.id}</TableCell>
                   <TableCell>{amendment.autor}</TableCell>

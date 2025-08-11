@@ -1,3 +1,4 @@
+
 export const users = [
   { id: 1, name: 'Alice', avatar: 'https://placehold.co/40x40.png', online: true, lastMessage: 'Ok, vou verificar.', lastMessageTime: '10:40 AM', unread: 2 },
   { id: 2, name: 'Carlos', avatar: 'https://placehold.co/40x40.png', online: false, lastMessage: 'O relatório está pronto.', lastMessageTime: '9:30 AM', unread: 0 },
@@ -139,9 +140,11 @@ export const amendments = [
     funcao: 'Saúde',
     subfuncao: 'Assistência hospitalar e ambulatorial',
     valorEmpenhado: 'R$ 100.000,00',
+    valor: 'R$ 100.000,00',
     valorPago: 'R$ 100.000,00',
     valorLiberar: 'R$ 0,00',
-    porcentagem: 100
+    porcentagem: 100,
+    status: 'Aprovada'
   },
   { 
     id: '201830490004',
@@ -153,9 +156,11 @@ export const amendments = [
     funcao: 'Saúde',
     subfuncao: 'Administração geral',
     valorEmpenhado: 'R$ 6.486.136,00',
+     valor: 'R$ 6.486.136,00',
     valorPago: 'R$ 0,00',
     valorLiberar: 'R$ 6.486.136,00',
-    porcentagem: 0
+    porcentagem: 0,
+    status: 'Rejeitada'
   },
   { 
     id: '201930490003',
@@ -167,9 +172,11 @@ export const amendments = [
     funcao: 'Saúde',
     subfuncao: 'Assistência hospitalar e ambulatorial',
     valorEmpenhado: 'R$ 7.610.387,00',
+    valor: 'R$ 7.610.387,00',
     valorPago: 'R$ 7.610.387,00',
     valorLiberar: 'R$ 0,00',
-    porcentagem: 100
+    porcentagem: 100,
+    status: 'Aprovada'
   },
   { 
     id: '201630300002',
@@ -181,9 +188,11 @@ export const amendments = [
     funcao: 'Urbanismo',
     subfuncao: 'Assistência comunitária',
     valorEmpenhado: 'R$ 342.143,00',
+    valor: 'R$ 342.143,00',
     valorPago: 'R$ 171.071,00',
     valorLiberar: 'R$ 171.072,00',
-    porcentagem: 50
+    porcentagem: 50,
+    status: 'Em análise'
   },
   { 
     id: '201730490002',
@@ -195,9 +204,11 @@ export const amendments = [
     funcao: 'Saúde',
     subfuncao: 'Saneamento básico urbano',
     valorEmpenhado: 'R$ 2.343.887,00',
+    valor: 'R$ 2.343.887,00',
     valorPago: 'R$ 0,00',
     valorLiberar: 'R$ 2.343.887,00',
-    porcentagem: 0
+    porcentagem: 0,
+    status: 'Pendente'
   },
   {
     id: '201830490005',
@@ -209,9 +220,11 @@ export const amendments = [
     funcao: 'Saúde',
     subfuncao: 'Atenção básica',
     valorEmpenhado: 'R$ 799.942,00',
+    valor: 'R$ 799.942,00',
     valorPago: 'R$ 196.000,00',
     valorLiberar: 'R$ 603.942,00',
-    porcentagem: 24.5
+    porcentagem: 24.5,
+    status: 'Em análise'
   },
   {
     id: '201930490001',
@@ -223,9 +236,11 @@ export const amendments = [
     funcao: 'Defesa nacional',
     subfuncao: 'Assistência comunitária',
     valorEmpenhado: 'R$ 7.610.387,00',
+    valor: 'R$ 7.610.387,00',
     valorPago: 'R$ 0,00',
     valorLiberar: 'R$ 7.610.387,00',
-    porcentagem: 0
+    porcentagem: 0,
+    status: 'Rejeitada'
   },
   {
     id: '201730490003',
@@ -237,9 +252,11 @@ export const amendments = [
     funcao: 'Saúde',
     subfuncao: 'Assistência hospitalar e ambulatorial',
     valorEmpenhado: 'R$ 100.000,00',
+    valor: 'R$ 100.000,00',
     valorPago: 'R$ 100.000,00',
     valorLiberar: 'R$ 0,00',
-    porcentagem: 100
+    porcentagem: 100,
+    status: 'Aprovada'
   },
   {
     id: '201730490004',
@@ -251,9 +268,11 @@ export const amendments = [
     funcao: 'Saúde',
     subfuncao: 'Saneamento básico rural',
     valorEmpenhado: 'R$ 4.092.563,00',
+    valor: 'R$ 4.092.563,00',
     valorPago: 'R$ 0,00',
     valorLiberar: 'R$ 4.092.563,00',
-    porcentagem: 0
+    porcentagem: 0,
+    status: 'Pendente'
   },
   {
     id: '201630300001',
@@ -265,8 +284,11 @@ export const amendments = [
     funcao: 'Defesa nacional',
     subfuncao: 'Assistência comunitária',
     valorEmpenhado: 'R$ 6.471.218,00',
+    valor: 'R$ 6.471.218,00',
     valorPago: 'R$ 0,00',
     valorLiberar: 'R$ 6.471.218,00',
-    porcentagem: 0
+    porcentagem: 0,
+    status: 'Rejeitada'
   }
 ];
+

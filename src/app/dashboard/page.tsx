@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -36,11 +37,15 @@ const getAmendmentStatusVariant = (status: string) => {
   }
 };
 
+const getConventionStatus = (situacao: string) => {
+    return situacao.toLowerCase() === 'adimplente' || situacao.toLowerCase() === 'em execução';
+}
+
 export default function DashboardPage() {
   const totalConventions = conventions.length;
-  const activeConventions = conventions.filter(c => c.situacao.toLowerCase() === 'ativo').length;
+  const activeConventions = conventions.filter(c => getConventionStatus(c.situacao)).length;
   const totalAmendments = amendments.length;
-  const approvedAmendments = amendments.filter(a => a.status.toLowerCase() === 'aprovada').length;
+  const approvedAmendments = amendments.filter(a => a.status && a.status.toLowerCase() === 'aprovada').length;
   const totalUsers = users.length;
 
   const recentAmendments = [...amendments].slice(0, 5);

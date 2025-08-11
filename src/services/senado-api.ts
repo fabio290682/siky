@@ -25,6 +25,14 @@ interface SenadoresResponse {
     };
 }
 
+interface LegislaturaResponse {
+    ListaParlamentarLegislatura: {
+        Parlamentares: {
+            Parlamentar: Senador[];
+        }
+    }
+}
+
 export interface Mandato {
     CodigoMandato: string;
     UfParlamentar: string;
@@ -87,12 +95,36 @@ async function fetchWithCache(url: string, options?: RequestInit) {
 
 export async function getSenadores(): Promise<Senador[]> {
     try {
-        const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/atual`);
-        if (!response.ok) {
-            throw new Error('Erro ao buscar senadores');
+        const currentLegislatureResponse = await fetchWithCache(`${API_BASE_URL}/senador/lista/atual`);
+        if (!currentLegislatureResponse.ok) {
+            throw new Error('Erro ao buscar senadores da legislatura atual');
         }
-        const data: SenadoresResponse = await response.json();
-        return data.ListaParlamentarEmExercicio.Parlamentares.Parlamentar;
+        const currentLegislatureData: SenadoresResponse = await currentLegislatureResponse.json();
+        const senadores = new Map(currentLegislatureData.ListaParlamentarEmExercicio.Parlamentares.Parlamentar.map(s => [s.IdentificacaoParlamentar.CodigoParlamentar, s]));
+
+        // Fetching senators from previous legislatures. Let's say from 50 to current.
+        // The senate was created in 1826. We'll fetch a few recent ones for performance.
+        const LATEST_LEGISLATURA = 57;
+        const EARLIEST_LEGISLATURA = 50;
+
+        for (let i = LATEST_LEGISLATURA; i >= EARLIEST_LEGISLATURA; i--) {
+             const response = await fetchWithCache(`${API_BASE_URL}/senador/lista/legislatura/${i}`);
+             if (response.ok) {
+                const data: LegislaturaResponse = await response.json();
+                if (data.ListaParlamentarLegislatura.Parlamentares.Parlamentar) {
+                    data.ListaParlamentarLegislatura.Parlamentares.Parlamentar.forEach(senador => {
+                        if (!senadores.has(senador.IdentificacaoParlamentar.CodigoParlamentar)) {
+                            senadores.set(senador.IdentificacaoParlamentar.CodigoParlamentar, senador);
+                        }
+                    });
+                }
+             } else {
+                console.warn(`Não foi possível buscar senadores da legislatura ${i}`);
+             }
+        }
+        
+        return Array.from(senadores.values());
+
     } catch (error) {
         console.error('Falha ao buscar dados dos senadores:', error);
         return [];

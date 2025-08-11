@@ -105,7 +105,11 @@ export async function getSenadores(): Promise<Senador[]> {
 
 export async function getSenadorDetalhes(id: string): Promise<SenadorDetalhes | null> {
     try {
-        const response = await fetchWithCache(`${API_BASE_URL}/senador/${id}`);
+        const response = await fetchWithCache(`${API_BASE_URL}/senador/${id}`, {
+             headers: {
+                'Accept': 'application/json'
+            }
+        });
         if (!response.ok) {
             throw new Error(`Erro ao buscar detalhes do senador: ${id}`);
         }

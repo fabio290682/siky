@@ -42,7 +42,7 @@ export default async function SenatorDetailPage({ params }: { params: { id: stri
     const senatorId = params.id;
     const senatorData = await getSenadorDetalhes(senatorId);
 
-    if (!senatorData) {
+    if (!senatorData || !senatorData.DetalheParlamentar) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
                 <p className="text-xl text-muted-foreground">Senador não encontrado.</p>
@@ -57,6 +57,21 @@ export default async function SenatorDetailPage({ params }: { params: { id: stri
     }
     
     const { Parlamentar: senator } = senatorData.DetalheParlamentar;
+    
+    if (!senator) {
+         return (
+            <div className="flex flex-col items-center justify-center h-full">
+                <p className="text-xl text-muted-foreground">Detalhes do senador não puderam ser carregados.</p>
+                <Button asChild variant="link" className="mt-4">
+                    <Link href="/dashboard/senators">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Voltar para a lista
+                    </Link>
+                </Button>
+            </div>
+        )
+    }
+
     const { IdentificacaoParlamentar: id, DadosBasicosParlamentar: basicData, Mandato: currentMandate, OutrosMandatos: otherMandates } = senator;
     const otherMandatesList = Array.isArray(otherMandates?.Mandato) ? otherMandates.Mandato : (otherMandates?.Mandato ? [otherMandates.Mandato] : []);
 
@@ -114,7 +129,7 @@ export default async function SenatorDetailPage({ params }: { params: { id: stri
                             <CardDescription>Histórico de mandatos do senador.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <MandateCard mandato={currentMandate} />
+                            {currentMandate && <MandateCard mandato={currentMandate} />}
                             {otherMandatesList.map(m => <MandateCard key={m.CodigoMandato} mandato={m} />)}
                         </CardContent>
                    </Card>

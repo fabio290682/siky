@@ -32,6 +32,7 @@ const TableHeaderCell = ({ children }: { children: React.ReactNode }) => (
 );
 
 const parseCurrency = (value: string) => {
+    if (!value || typeof value !== 'string') return 0;
     return parseFloat(value.replace('R$ ', '').replace(/\./g, '').replace(',', '.'));
 }
 

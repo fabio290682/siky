@@ -97,6 +97,60 @@ interface PartidosResponse {
     links: Link[];
 }
 
+interface Despesa {
+    ano: number;
+    mes: number;
+    tipoDespesa: string;
+    codDocumento: number;
+    tipoDocumento: string;
+    codTipoDocumento: number;
+    dataDocumento: string;
+    numDocumento: string;
+    valorDocumento: number;
+    urlDocumento: string;
+    nomeFornecedor: string;
+    cnpjCpfFornecedor: string;
+    valorLiquido: number;
+    valorGlosa: number;
+    numRessarcimento: string;
+    codLote: number;
+    parcela: number;
+}
+
+interface DespesasResponse {
+    dados: Despesa[];
+    links: Link[];
+}
+
+interface Orgao {
+    idOrgao: string;
+    siglaOrgao: string;
+    nomeOrgao: string;
+    uriOrgao: string;
+    codTitulo: string;
+    titulo: string;
+    dataInicio: string;
+    dataFim: string | null;
+}
+
+interface OrgaosResponse {
+    dados: Orgao[];
+    links: Link[];
+}
+
+interface Frente {
+    id: number;
+    uri: string;
+    titulo: string;
+    idLegislatura: number;
+}
+
+interface FrentesResponse {
+    dados: Frente[];
+    links: Link[];
+}
+
+
 export async function getDeputados(): Promise<DeputadosResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/deputados?ordem=ASC&ordenarPor=nome`);
@@ -127,6 +181,50 @@ export async function getDeputadoDetalhes(id: number): Promise<DeputadoDetalhesR
         throw error;
     }
 }
+
+export async function getDeputadoDespesas(id: number): Promise<DespesasResponse> {
+    try {
+        const url = `${API_BASE_URL}/deputados/${id}/despesas?ordem=DESC&ordenarPor=ano&itens=100`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar despesas do deputado: ${id}`);
+        }
+        const data: DespesasResponse = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`Falha ao buscar despesas do deputado ${id}:`, error);
+        return { dados: [], links: [] };
+    }
+}
+
+export async function getDeputadoOrgaos(id: number): Promise<OrgaosResponse> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/deputados/${id}/orgaos?ordem=ASC&ordenarPor=nomeOrgao`);
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar órgãos do deputado: ${id}`);
+        }
+        const data: OrgaosResponse = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`Falha ao buscar órgãos do deputado ${id}:`, error);
+        return { dados: [], links: [] };
+    }
+}
+
+export async function getDeputadoFrentes(id: number): Promise<FrentesResponse> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/deputados/${id}/frentes`);
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar frentes do deputado: ${id}`);
+        }
+        const data: FrentesResponse = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`Falha ao buscar frentes do deputado ${id}:`, error);
+        return { dados: [], links: [] };
+    }
+}
+
 
 export async function getPartidos(): Promise<PartidosResponse> {
     try {

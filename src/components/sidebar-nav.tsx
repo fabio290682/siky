@@ -13,7 +13,8 @@ import {
   Building2,
   FileBarChart,
   Star,
-  Users
+  Users,
+  Network
 } from "lucide-react"
 
 import {
@@ -28,12 +29,13 @@ const menuItems = [
   { href: "/dashboard/conventions", label: "Convênios", icon: BookCopy },
   { href: "/dashboard/amendments", label: "Emendas", icon: FileText },
   { href: "/dashboard/special-amendments", label: "Emendas Especiais", icon: Star },
+  { href: "/dashboard/parliamentarians", label: "Parlamentares", icon: Users },
   { href: "/dashboard/investsus", label: "InvestSUS", icon: Briefcase },
   { href: "/dashboard/sismob", label: "SISMOB", icon: Building2 },
   { href: "/dashboard/siop", label: "SIOP", icon: SlidersHorizontal },
   { href: "/dashboard/managerial-report", label: "Relatório Gerencial", icon: FileBarChart },
   { href: "/dashboard/status", label: "Status", icon: HeartPulse },
-  { href: "/dashboard/integrations", label: "Integrações", icon: Users },
+  { href: "/dashboard/integrations", label: "Integrações", icon: Network },
 ]
 
 export function SidebarNav() {
@@ -45,7 +47,7 @@ export function SidebarNav() {
         <SidebarMenuItem key={item.href}>
           <SidebarMenuButton
             asChild
-            isActive={pathname === item.href}
+            isActive={pathname.startsWith(item.href) && (item.href !== "/dashboard" || pathname === "/dashboard")}
             tooltip={item.label}
           >
             <Link href={item.href}>

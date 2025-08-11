@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getDeputadoDetalhes, getDeputadoDespesas, getDeputadoOrgaos, getDeputadoFrentes } from "@/services/camara-api";
-import { ArrowLeft, Briefcase, Building, Cake, Mail, MapPin, Phone, User, ExternalLink, HandCoins, Building2, Landmark } from "lucide-react";
+import { ArrowLeft, Briefcase, Building, Cake, Mail, MapPin, Phone, User, ExternalLink, HandCoins, Building2, Landmark, FileText } from "lucide-react";
 import Link from "next/link";
 import { format } from 'date-fns';
 
@@ -130,19 +130,30 @@ export default async function ParliamentarianDetailPage({ params }: { params: { 
                                                 <TableHead>Tipo</TableHead>
                                                 <TableHead>Fornecedor</TableHead>
                                                 <TableHead>Valor</TableHead>
+                                                <TableHead>Nota Fiscal</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {despesas.length > 0 ? despesas.map(d => (
                                                 <TableRow key={d.codDocumento}>
-                                                    <TableCell>{format(new Date(d.dataDocumento), 'dd/MM/yyyy')}</TableCell>
+                                                    <TableCell>{d.dataDocumento ? format(new Date(d.dataDocumento), 'dd/MM/yyyy') : 'N/A'}</TableCell>
                                                     <TableCell>{d.tipoDespesa}</TableCell>
                                                     <TableCell>{d.nomeFornecedor}</TableCell>
                                                     <TableCell>{formatCurrency(d.valorLiquido)}</TableCell>
+                                                    <TableCell>
+                                                        {d.urlDocumento && (
+                                                            <Button variant="outline" size="sm" asChild>
+                                                                <Link href={d.urlDocumento} target="_blank" rel="noopener noreferrer">
+                                                                    <FileText className="mr-2 h-4 w-4" />
+                                                                    Ver Nota
+                                                                </Link>
+                                                            </Button>
+                                                        )}
+                                                    </TableCell>
                                                 </TableRow>
                                             )) : (
                                                 <TableRow>
-                                                    <TableCell colSpan={4} className="h-24 text-center">Nenhuma despesa encontrada.</TableCell>
+                                                    <TableCell colSpan={5} className="h-24 text-center">Nenhuma despesa encontrada.</TableCell>
                                                 </TableRow>
                                             )}
                                         </TableBody>

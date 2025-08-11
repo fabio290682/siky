@@ -43,6 +43,10 @@ export default function AmendmentsPage() {
     if (filter === 'senadores') {
       return amendment.autor.toLowerCase().includes('senador');
     }
+    // The new filters do not have associated data, so they will show an empty table for now.
+    if (['siop', 'sismob', 'investsus'].includes(filter)) {
+        return false;
+    }
     return true; // 'all'
   });
 
@@ -58,12 +62,21 @@ export default function AmendmentsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex space-x-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4">
             <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>
               Parlamentares
             </Button>
             <Button variant={filter === 'senadores' ? 'default' : 'outline'} onClick={() => setFilter('senadores')}>
               Senadores
+            </Button>
+            <Button variant={filter === 'siop' ? 'default' : 'outline'} onClick={() => setFilter('siop')}>
+              Siop
+            </Button>
+            <Button variant={filter === 'sismob' ? 'default' : 'outline'} onClick={() => setFilter('sismob')}>
+              Sismob
+            </Button>
+            <Button variant={filter === 'investsus' ? 'default' : 'outline'} onClick={() => setFilter('investsus')}>
+              Investsus
             </Button>
           </div>
           <Table>
@@ -77,19 +90,27 @@ export default function AmendmentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAmendments.map((amendment) => (
-                <TableRow key={amendment.id}>
-                  <TableCell className="font-medium">{amendment.id}</TableCell>
-                  <TableCell>{amendment.autor}</TableCell>
-                  <TableCell>{amendment.funcao}</TableCell>
-                  <TableCell>{amendment.valor}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(amendment.status)}>
-                      {amendment.status}
-                    </Badge>
+              {filteredAmendments.length > 0 ? (
+                filteredAmendments.map((amendment) => (
+                  <TableRow key={amendment.id}>
+                    <TableCell className="font-medium">{amendment.id}</TableCell>
+                    <TableCell>{amendment.autor}</TableCell>
+                    <TableCell>{amendment.funcao}</TableCell>
+                    <TableCell>{amendment.valor}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(amendment.status)}>
+                        {amendment.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    Nenhum resultado encontrado.
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>

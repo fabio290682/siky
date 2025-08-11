@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { getEmendaDetail, type Emenda } from "@/src/services/transparencia-api";
+import { getEmendaDetail, type Emenda } from "@/services/transparencia-api";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 

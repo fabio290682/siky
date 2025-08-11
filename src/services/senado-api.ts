@@ -105,6 +105,7 @@ export async function getSenadores(): Promise<Senador[]> {
         const LATEST_LEGISLATURA = 57;
         const legislaturePromises = [];
 
+        // Fetch all legislatures in parallel
         for (let i = 1; i <= LATEST_LEGISLATURA; i++) {
             legislaturePromises.push(fetchWithCache(`${API_BASE_URL}/senador/lista/legislatura/${i}`));
         }
@@ -116,12 +117,14 @@ export async function getSenadores(): Promise<Senador[]> {
                 const data: LegislaturaResponse = await response.json();
                 if (data.ListaParlamentarLegislatura.Parlamentares && data.ListaParlamentarLegislatura.Parlamentares.Parlamentar) {
                     data.ListaParlamentarLegislatura.Parlamentares.Parlamentar.forEach(senador => {
+                        // Add only if not already in the map to avoid duplicates
                         if (!senadores.has(senador.IdentificacaoParlamentar.CodigoParlamentar)) {
                             senadores.set(senador.IdentificacaoParlamentar.CodigoParlamentar, senador);
                         }
                     });
                 }
             } else {
+                // It's better to log a warning than to throw an error, so the app can still work with partial data.
                 console.warn(`Não foi possível buscar senadores de uma das legislaturas.`);
             }
         }

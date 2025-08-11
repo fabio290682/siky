@@ -68,6 +68,35 @@ interface DeputadoDetalhes {
     links: Link[];
   }
 
+interface Partido {
+    id: number;
+    sigla: string;
+    nome: string;
+    uri: string;
+}
+
+interface PartidoStatus {
+    id: number;
+    nome: string;
+    sigla: string;
+    uri: string;
+    status: {
+        lider: {
+            nome: string;
+            siglaPartido: string;
+            uriPartido: string;
+            uf: string;
+            idLegislatura: number;
+            urlFoto: string;
+        }
+    }
+}
+
+interface PartidosResponse {
+    dados: PartidoStatus[];
+    links: Link[];
+}
+
 export async function getDeputados(): Promise<DeputadosResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/deputados?ordem=ASC&ordenarPor=nome`);
@@ -96,5 +125,19 @@ export async function getDeputadoDetalhes(id: number): Promise<DeputadoDetalhesR
         // Return a structure that matches the expected return type but indicates an error state or is empty.
         // For simplicity, we'll throw the error up to be handled by the page component.
         throw error;
+    }
+}
+
+export async function getPartidos(): Promise<PartidosResponse> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/partidos?itens=100&ordem=ASC&ordenarPor=sigla`);
+        if (!response.ok) {
+            throw new Error('Erro ao buscar partidos');
+        }
+        const data: PartidosResponse = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Falha ao buscar dados dos partidos:', error);
+        return { dados: [], links: [] };
     }
 }

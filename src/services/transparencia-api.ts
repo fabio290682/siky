@@ -13,12 +13,12 @@ export interface Emenda {
     ano: number;
     autor: string;
     beneficiario: string;
-    codigo: string;
+    codigoEmenda: string;
     funcao: string;
-    localidade: string;
-    numero: string;
+    localidadeGasto: string;
+    numeroEmenda: string;
     subfuncao: string;
-    tipo: string;
+    tipoEmenda: string;
     valorEmpenhado: string;
     valorLiquidado: string;
     valorPago: string;

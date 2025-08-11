@@ -79,7 +79,16 @@ export default function ConventionsPage() {
                     </Link>
                   </Button>
                 </TableCell>
-                <TableCell className="font-medium">{convention.numero}</TableCell>
+                <TableCell className="font-medium">
+                  <Link 
+                    href={`https://discricionarias.transferegov.sistema.gov.br/voluntarias/ConsultarProposta/ResultadoDaConsultaDeConvenioSelecionarConvenio.do?sequencialConvenio=${convention.numero}&Usr=guest&Pwd=guest`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="underline hover:text-primary"
+                  >
+                    {convention.numero}
+                  </Link>
+                </TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(convention.situacao)} className="whitespace-nowrap">
                     {convention.situacao}

@@ -13,7 +13,6 @@ import {
   Building,
   Building2,
   FileBarChart,
-  Star,
   Users,
   Network
 } from "lucide-react"
@@ -29,7 +28,6 @@ const menuItems = [
   { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
   { href: "/dashboard/conventions", label: "Convênios", icon: BookCopy },
   { href: "/dashboard/amendments", label: "Emendas", icon: FileText },
-  { href: "/dashboard/special-amendments", label: "Emendas Especiais", icon: Star },
   { href: "/dashboard/parliamentarians", label: "Parlamentares", icon: Users },
   { href: "/dashboard/senators", label: "Senadores", icon: Users },
   { href: "/dashboard/parties", label: "Partidos", icon: Building },

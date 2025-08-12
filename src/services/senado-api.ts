@@ -81,6 +81,37 @@ interface SenadorDetalhes {
     };
 }
 
+interface Lideranca {
+    Codigo: string;
+    TipoLideranca: string;
+    IdentificacaoBloco?: {
+        Codigo: string;
+        Nome: string;
+        Sigla: string;
+    };
+    IdentificacaoPartido?: {
+        Codigo: string;
+        Nome: string;
+        Sigla: string;
+        DataCriacao: string;
+    };
+    Lideres?: {
+        Lider: {
+            DescricaoTipoLider: string;
+            IdentificacaoParlamentar: Senador['IdentificacaoParlamentar'];
+            DataDesignacao: string;
+            DataFimDesignacao?: string;
+        }[];
+    };
+}
+
+interface LiderancasResponse {
+    Liderancas: {
+        Lideranca: Lideranca[];
+    }
+}
+
+
 async function fetchWithCache(url: string, options?: RequestInit) {
     return fetch(url, { ...options, next: { revalidate: 3600 } });
 }
@@ -117,6 +148,22 @@ export async function getSenadorDetalhes(id: string): Promise<SenadorDetalhes | 
         return data;
     } catch (error) {
         console.error(`Falha ao buscar dados do senador ${id}:`, error);
+        return null;
+    }
+}
+
+export async function getLiderancasSenado(): Promise<Lideranca[] | null> {
+    try {
+        const response = await fetchWithCache(`${API_BASE_URL}/composicao/liderancas`, {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar lideranças do Senado: ${response.statusText}`);
+        }
+        const data: LiderancasResponse = await response.json();
+        return data.Liderancas.Lideranca;
+    } catch (error) {
+        console.error('Falha ao buscar dados de lideranças do Senado:', error);
         return null;
     }
 }

@@ -1105,3 +1105,4 @@ export const senators = [
       "foto": "https://www.senado.leg.br/senadores/img/fotos-oficiais/senador5966.jpg"
     }
 ]
+

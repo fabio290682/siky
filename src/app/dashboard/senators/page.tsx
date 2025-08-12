@@ -16,12 +16,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { getSenadores } from "@/services/senado-api";
+import { senators } from "@/lib/data";
 import { Users, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export default async function SenatorsPage() {
-    const senadores = await getSenadores();
+    const senadores = senators;
 
     return (
         <Card>
@@ -49,26 +49,26 @@ export default async function SenatorsPage() {
                     <TableBody>
                         {senadores && senadores.length > 0 ? (
                             senadores.map((senador) => (
-                                <TableRow key={senador.IdentificacaoParlamentar.CodigoParlamentar}>
+                                <TableRow key={senador.id}>
                                     <TableCell>
                                         <Avatar>
-                                            <AvatarImage src={senador.IdentificacaoParlamentar.UrlFotoParlamentar} alt={senador.IdentificacaoParlamentar.NomeParlamentar} />
-                                            <AvatarFallback>{senador.IdentificacaoParlamentar.NomeParlamentar.charAt(0)}</AvatarFallback>
+                                            <AvatarImage src={senador.foto} alt={senador.nome} />
+                                            <AvatarFallback>{senador.nome.charAt(0)}</AvatarFallback>
                                         </Avatar>
                                     </TableCell>
-                                    <TableCell className="font-medium">{senador.IdentificacaoParlamentar.NomeParlamentar}</TableCell>
+                                    <TableCell className="font-medium">{senador.nome}</TableCell>
                                     <TableCell>
-                                        <Badge variant="secondary">{senador.IdentificacaoParlamentar.SiglaPartidoParlamentar}</Badge>
+                                        <Badge variant="secondary">{senador.partido}</Badge>
                                     </TableCell>
-                                    <TableCell>{senador.IdentificacaoParlamentar.UfParlamentar}</TableCell>
+                                    <TableCell>{senador.uf}</TableCell>
                                     <TableCell>
-                                        <a href={`mailto:${senador.IdentificacaoParlamentar.EmailParlamentar}`} className="hover:underline">
-                                            {senador.IdentificacaoParlamentar.EmailParlamentar}
+                                        <a href={`mailto:${senador.email}`} className="hover:underline">
+                                            {senador.email}
                                         </a>
                                     </TableCell>
                                     <TableCell>
                                         <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/dashboard/senators/${senador.IdentificacaoParlamentar.CodigoParlamentar}`}>
+                                            <Link href={`/dashboard/senators/${senador.id}`}>
                                                 <ExternalLink className="mr-2 h-4 w-4" />
                                                 Ver Perfil
                                             </Link>
@@ -89,3 +89,4 @@ export default async function SenatorsPage() {
         </Card>
     );
 }
+

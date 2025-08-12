@@ -94,7 +94,7 @@ export default async function AmendmentsPage() {
                 amendments.map((amendment) => {
                     const { valorLiberar, porcentagem } = calculateAmendmentValues(amendment);
                     return (
-                        <TableRow key={amendment.codigoEmenda}>
+                        <TableRow key={`${amendment.codigoEmenda}-${amendment.ano}`}>
                             <TableCell>
                             <Button variant="outline" size="sm" asChild>
                                 <Link href={`https://portaldatransparencia.gov.br/emendas/detalhe?codigoEmenda=${amendment.codigoEmenda}&ordenarPor=data&direcao=asc`} target="_blank" rel="noopener noreferrer">

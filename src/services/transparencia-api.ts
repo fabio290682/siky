@@ -25,70 +25,43 @@ export interface Emenda {
     valorRestoAPagar: string;
 }
 
-async function fetchWithCache(url: string, options?: RequestInit) {
+async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number>, isArray: boolean = true): Promise<T | T[]> {
     if (!API_KEY) {
-        return new Response(JSON.stringify([]), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        if (isArray) return [];
+        return null as T;
     }
-    return fetch(url, { 
-        ...options, 
-        headers: { ...options?.headers, 'chave-api-dados': API_KEY },
-        next: { revalidate: 3600 } 
+    const url = new URL(`${API_BASE_URL}/${endpoint}`);
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) url.searchParams.append(key, String(value));
     });
-}
-
-export async function getEmendas(ano: number, pagina: number = 1): Promise<Emenda[]> {
-    if (!API_KEY) {
-        console.log("Retornando dados mocados de emendas pois a chave da API não foi configurada.");
-        return [];
-    }
 
     try {
-        const url = new URL(`${API_BASE_URL}/emendas`);
-        url.searchParams.append('ano', ano.toString());
-        url.searchParams.append('pagina', pagina.toString());
-
-        const response = await fetchWithCache(url.toString());
+        const response = await fetch(url.toString(), {
+            headers: { 'chave-api-dados': API_KEY },
+            next: { revalidate: 3600 } 
+        });
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Erro ao buscar emendas: ${response.status} ${errorText}`);
+            console.error(`Erro na API: ${response.status} ${errorText}`);
+            if (isArray) return [];
+            return null as T;
         }
 
-        const data: Emenda[] = await response.json();
-        return data;
+        return response.json();
     } catch (error) {
-        console.error('Falha ao buscar dados de emendas:', error);
-        return [];
+        console.error(`Falha ao buscar dados da API para o endpoint ${endpoint}:`, error);
+        if (isArray) return [];
+        return null as T;
     }
 }
 
+
+export async function getEmendas(ano: number, pagina: number = 1): Promise<Emenda[]> {
+    return fetchFromApi<Emenda>('emendas', { ano, pagina }, true) as Promise<Emenda[]>;
+}
+
 export async function getEmendaDetail(codigo: string): Promise<Emenda | null> {
-    if (!API_KEY) {
-        console.log(`Retornando null para getEmendaDetail pois a chave da API não foi configurada (código: ${codigo}).`);
-        return null;
-    }
-
-    try {
-        const url = new URL(`${API_BASE_URL}/emendas/${codigo}`);
-
-        const response = await fetchWithCache(url.toString());
-
-        if (!response.ok) {
-             if (response.status === 404) {
-                console.warn(`Nenhuma emenda encontrada com o código: ${codigo}`);
-                return null;
-            }
-            throw new Error(`Erro ao buscar detalhes da emenda: ${response.status}`);
-        }
-        
-        const data: Emenda = await response.json();
-        return data;
-
-    } catch (error) {
-        console.error(`Falha ao buscar detalhes da emenda ${codigo}:`, error);
-        return null;
-    }
+    if (!codigo) return null;
+    return fetchFromApi<Emenda>(`emendas/${codigo}`, {}, false) as Promise<Emenda | null>;
 }

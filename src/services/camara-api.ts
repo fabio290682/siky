@@ -1,3 +1,4 @@
+
 'use server';
 
 const API_BASE_URL = 'https://dadosabertos.camara.leg.br/api/v2';
@@ -188,7 +189,8 @@ export async function getDeputadoDespesas(id: number): Promise<DespesasResponse>
         const url = `${API_BASE_URL}/deputados/${id}/despesas?ordem=DESC&ordenarPor=ano&itens=100`;
         const response = await fetchWithCache(url);
         if (!response.ok) {
-            throw new Error(`Erro ao buscar despesas do deputado: ${id}`);
+            console.error(`Erro ao buscar despesas do deputado: ${id}. Status: ${response.status}`);
+            return { dados: [], links: [] };
         }
         const data: DespesasResponse = await response.json();
         return data;
@@ -202,7 +204,8 @@ export async function getDeputadoOrgaos(id: number): Promise<OrgaosResponse> {
     try {
         const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}/orgaos?ordem=ASC&ordenarPor=nomeOrgao`);
         if (!response.ok) {
-            throw new Error(`Erro ao buscar órgãos do deputado: ${id}`);
+            console.error(`Erro ao buscar órgãos do deputado: ${id}. Status: ${response.status}`);
+            return { dados: [], links: [] };
         }
         const data: OrgaosResponse = await response.json();
         return data;
@@ -216,7 +219,8 @@ export async function getDeputadoFrentes(id: number): Promise<FrentesResponse> {
     try {
         const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}/frentes`);
         if (!response.ok) {
-            throw new Error(`Erro ao buscar frentes do deputado: ${id}`);
+            console.error(`Erro ao buscar frentes do deputado: ${id}. Status: ${response.status}`);
+            return { dados: [], links: [] };
         }
         const data: FrentesResponse = await response.json();
         return data;

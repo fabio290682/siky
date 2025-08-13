@@ -14,7 +14,8 @@ import {
   Building2,
   FileBarChart,
   Users,
-  Network
+  Network,
+  ExternalLink
 } from "lucide-react"
 
 import {
@@ -32,6 +33,12 @@ const menuItems = [
   { href: "/dashboard/senators", label: "Senadores", icon: Users },
   { href: "/dashboard/parties", label: "Partidos", icon: Building },
   { href: "/dashboard/investsus", label: "InvestSUS", icon: Briefcase },
+  { 
+    href: "https://investsuspaineis.saude.gov.br/extensions/CGIN_Painel_FAF/CGIN_Painel_FAF.html", 
+    label: "Repasses", 
+    icon: ExternalLink,
+    external: true 
+  },
   { href: "/dashboard/sismob", label: "SISMOB", icon: Building2 },
   { href: "/dashboard/siop", label: "SIOP", icon: SlidersHorizontal },
   { href: "/dashboard/managerial-report", label: "Relatório Gerencial", icon: FileBarChart },
@@ -48,13 +55,20 @@ export function SidebarNav() {
         <SidebarMenuItem key={item.href}>
           <SidebarMenuButton
             asChild
-            isActive={pathname.startsWith(item.href) && (item.href !== "/dashboard" || pathname === "/dashboard")}
+            isActive={!item.external && pathname.startsWith(item.href) && (item.href !== "/dashboard" || pathname === "/dashboard")}
             tooltip={item.label}
           >
-            <Link href={item.href}>
-              <item.icon />
-              <span>{item.label}</span>
-            </Link>
+            {item.external ? (
+              <a href={item.href} target="_blank" rel="noopener noreferrer">
+                <item.icon />
+                <span>{item.label}</span>
+              </a>
+            ) : (
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            )}
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}

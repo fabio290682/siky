@@ -6,14 +6,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Briefcase, ExternalLink, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Briefcase, Info } from "lucide-react";
 
 export default function InvestSUSPage() {
   const investsusUrl = "https://investsuspaineis.saude.gov.br/extensions/CGIN_InvestsusPaineis/CGIN_InvestsusPaineis.html";
-  const repassesUrl = "https://investsuspaineis.saude.gov.br/extensions/CGIN_Painel_FAF/CGIN_Painel_FAF.html";
-
 
   return (
     <div className="space-y-6">
@@ -28,12 +24,6 @@ export default function InvestSUSPage() {
                     Visualização dos painéis de dados do sistema InvestSUS do Ministério da Saúde.
                 </CardDescription>
             </div>
-            <Button asChild>
-                <Link href={repassesUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Repasses
-                </Link>
-            </Button>
         </CardHeader>
         <CardContent>
           <Alert>

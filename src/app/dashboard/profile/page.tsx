@@ -36,8 +36,8 @@ export default function ProfilePage() {
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            name: "João da Silva",
-            email: "joao.silva@email.com",
+            name: "PAULO DANGELO DE ARAUJO",
+            email: "univox@gmail.com",
             currentPassword: "",
             newPassword: "",
         }

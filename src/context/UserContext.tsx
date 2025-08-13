@@ -14,8 +14,8 @@ type UserContextType = {
 };
 
 const defaultUser: UserData = {
-    name: 'Usuário',
-    email: 'usuario@example.com',
+    name: 'Jeferson.Ishikawa',
+    email: 'jeferson.ishikawa@example.com',
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);

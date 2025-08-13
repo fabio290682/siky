@@ -76,7 +76,7 @@ export default function DashboardPage() {
             setIsLoading(true);
 
             const [emendasData, deputadosData] = await Promise.all([
-                getEmendas(currentYear, 1), 
+                getEmendas(currentYear, 1),
                 getDeputados()
             ]);
 
@@ -87,7 +87,7 @@ export default function DashboardPage() {
                 acc.empenhado += parseCurrency(emenda.valorEmpenhado);
                 return acc;
             }, { pago: 0, empenhado: 0 });
-            
+
             const valorALiberar = totalValores.empenhado - totalValores.pago;
 
             setKpiData({
@@ -110,7 +110,7 @@ export default function DashboardPage() {
             }, {} as Record<string, {name: string, value: number}>);
 
             const chartDataFuncao = Object.values(emendasPorFuncao).sort((a,b) => b.value - a.value).slice(0, 10);
-            
+
             const monthlyData = Array.from({ length: 12 }, (_, i) => ({
               name: new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
               Empenhado: 0,
@@ -118,7 +118,7 @@ export default function DashboardPage() {
             }));
 
             emendasData.forEach((emenda, index) => {
-                const monthIndex = index % 12; 
+                const monthIndex = index % 12;
                 monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
                 monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
             });
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                     { name: 'A Pagar', value: valorALiberar > 0 ? valorALiberar : 0 }
                 ]
             });
-            
+
             setIsLoading(false);
         };
 
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                           <XAxis type="number" hide />
                           <YAxis dataKey="name" type="category" width={100} tickLine={false} axisLine={false} stroke="#888888" fontSize={12} />
-                          <Tooltip 
+                          <Tooltip
                             cursor={{ fill: 'hsl(var(--muted))' }}
                             formatter={(value: number) => formatCurrency(value)}
                           />

@@ -28,10 +28,19 @@ const formatCurrency = (value: number) => {
 
 export default async function ParliamentarianDetailPage({ params }: { params: { id: string } }) {
     const deputadoId = parseInt(params.id);
-    const { dados: deputado } = await getDeputadoDetalhes(deputadoId);
-    const { dados: despesas } = await getDeputadoDespesas(deputadoId);
-    const { dados: orgaos } = await getDeputadoOrgaos(deputadoId);
-    const { dados: frentes } = await getDeputadoFrentes(deputadoId);
+
+    const [deputadoResponse, despesasResponse, orgaosResponse, frentesResponse] = await Promise.all([
+        getDeputadoDetalhes(deputadoId),
+        getDeputadoDespesas(deputadoId),
+        getDeputadoOrgaos(deputadoId),
+        getDeputadoFrentes(deputadoId)
+    ]);
+
+    const { dados: deputado } = deputadoResponse;
+    const { dados: despesas } = despesasResponse;
+    const { dados: orgaos } = orgaosResponse;
+    const { dados: frentes } = frentesResponse;
+
 
     if (!deputado) {
         return (

@@ -1,12 +1,10 @@
 
-"use client";
-
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Mail, Phone, User, ExternalLink, Loader2 } from "lucide-react";
+import { ArrowLeft, Mail, Phone, User, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { getSenador, type Senator } from "@/services/senado-api";
 
@@ -20,28 +18,8 @@ const DetailItem = ({ icon, label, children }: { icon: React.ReactNode, label: s
     </div>
 );
 
-export default function SenatorDetailPage({ params }: { params: { id: string } }) {
-    const [senator, setSenator] = React.useState<Senator | null>(null);
-    const [isLoading, setIsLoading] = React.useState(true);
-
-    React.useEffect(() => {
-        async function fetchSenator() {
-            setIsLoading(true);
-            const senatorData = await getSenador(params.id);
-            setSenator(senatorData);
-            setIsLoading(false);
-        }
-        fetchSenator();
-    }, [params.id]);
-
-
-    if (isLoading) {
-         return (
-            <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        )
-    }
+export default async function SenatorDetailPage({ params }: { params: { id: string } }) {
+    const senator = await getSenador(params.id);
 
     if (!senator) {
         return (

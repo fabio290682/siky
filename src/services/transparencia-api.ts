@@ -1,3 +1,4 @@
+
 'use server';
 
 // NOTE: The API key needs to be configured in your environment variables.

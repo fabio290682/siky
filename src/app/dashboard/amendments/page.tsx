@@ -18,10 +18,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AmendmentSummarizer } from "@/components/amendment-summarizer";
 import { getEmendas, type Emenda } from "@/services/transparencia-api";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
+import { Filter, Loader2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 const parseCurrency = (value: string) => {
   if (!value || typeof value !== "string") return 0;
@@ -48,16 +59,71 @@ const calculateAmendmentValues = (emenda: Emenda) => {
   };
 };
 
+const generateYearOptions = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let year = currentYear; year >= 2015; year--) {
+    years.push(year.toString());
+  }
+  return years;
+};
+
 export default function AmendmentsPage() {
-  const [amendments, setAmendments] = React.useState<Emenda[]>([]);
+  const [allAmendments, setAllAmendments] = React.useState<Emenda[]>([]);
+  const [filteredAmendments, setFilteredAmendments] = React.useState<Emenda[]>([]);
+  const [filters, setFilters] = React.useState<Record<string, string>>({});
+  const [selectedYear, setSelectedYear] = React.useState<string>(new Date().getFullYear().toString());
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const yearOptions = generateYearOptions();
 
   React.useEffect(() => {
     async function fetchData() {
-      const data = await getEmendas(2023);
-      setAmendments(data);
+      setIsLoading(true);
+      const data = await getEmendas(parseInt(selectedYear));
+      setAllAmendments(data);
+      setFilteredAmendments(data);
+      setIsLoading(false);
     }
     fetchData();
-  }, []);
+  }, [selectedYear]);
+
+  React.useEffect(() => {
+    let filteredData = [...allAmendments];
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) {
+        filteredData = filteredData.filter(item =>
+          String(item[key as keyof Emenda]).toLowerCase().includes(value.toLowerCase())
+        );
+      }
+    });
+    setFilteredAmendments(filteredData);
+  }, [filters, allAmendments]);
+
+  const handleFilterChange = (column: string, value: string) => {
+    setFilters(prev => ({ ...prev, [column]: value }));
+  };
+
+  const renderFilter = (column: keyof Emenda, title: string) => (
+    <div className="flex items-center gap-2">
+      <span>{title}</span>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-6 w-6">
+            <Filter className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-2" align="start">
+          <Input
+            placeholder={`Filtrar ${title}...`}
+            value={filters[column] || ""}
+            onChange={(e) => handleFilterChange(column, e.target.value)}
+            className="w-full"
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -65,32 +131,60 @@ export default function AmendmentsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Emendas Parlamentares</CardTitle>
-          <CardDescription>
-            Uma lista detalhada de todas as emendas parlamentares registradas no sistema.
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Emendas Parlamentares</CardTitle>
+              <CardDescription>
+                Uma lista detalhada de todas as emendas parlamentares registradas no sistema.
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="year-select">Ano</Label>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger id="year-select" className="w-[120px]">
+                    <SelectValue placeholder="Selecione o Ano" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {yearOptions.map(year => (
+                      <SelectItem key={year} value={year}>{year}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Detalhar</TableHead>
-                <TableHead>Ano Emenda</TableHead>
-                <TableHead>Tipo Emenda</TableHead>
-                <TableHead>Autor da Emenda</TableHead>
-                <TableHead>Número da Emenda</TableHead>
-                <TableHead>Localidade do Gasto</TableHead>
-                <TableHead>Função</TableHead>
-                <TableHead>Subfunção</TableHead>
-                <TableHead>Valor Empenhado</TableHead>
-                <TableHead>Valor Pago</TableHead>
+                <TableHead>{renderFilter('ano', 'Ano Emenda')}</TableHead>
+                <TableHead>{renderFilter('tipoEmenda', 'Tipo Emenda')}</TableHead>
+                <TableHead>{renderFilter('autor', 'Autor da Emenda')}</TableHead>
+                <TableHead>{renderFilter('numeroEmenda', 'Número da Emenda')}</TableHead>
+                <TableHead>{renderFilter('localidadeGasto', 'Localidade do Gasto')}</TableHead>
+                <TableHead>{renderFilter('funcao', 'Função')}</TableHead>
+                <TableHead>{renderFilter('subfuncao', 'Subfunção')}</TableHead>
+                <TableHead>{renderFilter('valorEmpenhado', 'Valor Empenhado')}</TableHead>
+                <TableHead>{renderFilter('valorPago', 'Valor Pago')}</TableHead>
                 <TableHead>Valor à Liberar</TableHead>
                 <TableHead>Porcentagem</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {amendments.length > 0 ? (
-                amendments.map((amendment) => {
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={12} className="h-36 text-center">
+                    <div className="flex justify-center items-center gap-2">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="text-muted-foreground">Buscando emendas...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredAmendments.length > 0 ? (
+                filteredAmendments.map((amendment) => {
                   const { valorLiberar, porcentagem } =
                     calculateAmendmentValues(amendment);
                   return (
@@ -128,7 +222,7 @@ export default function AmendmentsPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={12} className="h-24 text-center">
-                    Nenhum resultado encontrado.
+                    Nenhum resultado encontrado para o ano de {selectedYear}.
                   </TableCell>
                 </TableRow>
               )}

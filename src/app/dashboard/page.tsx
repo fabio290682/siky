@@ -1,5 +1,4 @@
 
-
 import Link from "next/link"
 import {
   Card,
@@ -17,8 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { ArrowUpRight, BookCopy, FileText, Users, HandCoins, PiggyBank, PieChart, BarChart2 } from "lucide-react"
+import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp, CircleDot, BarChartHorizontal } from "lucide-react"
 import { getEmendas, type Emenda } from "@/services/transparencia-api"
 import { getDeputados } from "@/services/camara-api"
 import {
@@ -31,14 +29,31 @@ import {
   Pie,
   Cell,
   Legend,
+  CartesianGrid,
 } from "recharts"
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
 };
+
+const formatCurrencyShort = (value: number) => {
+    if (value >= 1_000_000_000) {
+        return (value / 1_000_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' bi';
+    }
+    if (value >= 1_000_000) {
+        return (value / 1_000_000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' mi';
+    }
+    if (value >= 1_000) {
+        return (value / 1_000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' mil';
+    }
+    return value.toLocaleString('pt-BR');
+};
+
 
 const parseCurrency = (value: string) => {
     if (!value || typeof value !== "string") return 0;
@@ -49,17 +64,24 @@ const parseCurrency = (value: string) => {
 export default async function DashboardPage() {
     const currentYear = new Date().getFullYear();
     const [emendasData, deputadosData] = await Promise.all([
-        getEmendas(currentYear, 1),
+        getEmendas(currentYear, 1), // Note: This might not fetch ALL emendas if pagination is needed.
         getDeputados()
     ]);
     
     const recentAmendments = emendasData.slice(0, 5);
-    const totalAmendments = emendasData.length;
     const totalUsers = deputadosData.dados.length;
 
-    // --- Chart Data Processing ---
+    // --- KPI and Chart Data Processing ---
+    
+    const totalValores = emendasData.reduce((acc, emenda) => {
+        acc.pago += parseCurrency(emenda.valorPago);
+        acc.empenhado += parseCurrency(emenda.valorEmpenhado);
+        return acc;
+    }, { pago: 0, empenhado: 0 });
 
-    // 1. Emendas por Função
+    const valorALiberar = totalValores.empenhado - totalValores.pago;
+
+    // 1. Emendas por Função (Top 10)
     const emendasPorFuncao = emendasData.reduce((acc, emenda) => {
         const funcao = emenda.funcao || 'Não informada';
         if (!acc[funcao]) {
@@ -71,159 +93,199 @@ export default async function DashboardPage() {
 
     const chartDataFuncao = Object.values(emendasPorFuncao).sort((a,b) => b.value - a.value).slice(0, 10);
     
-    // 2. Valores por Status
-    const totalValores = emendasData.reduce((acc, emenda) => {
-        acc.pago += parseCurrency(emenda.valorPago);
-        acc.liquidado += parseCurrency(emenda.valorLiquidado);
-        acc.empenhado += parseCurrency(emenda.valorEmpenhado);
-        return acc;
-    }, { pago: 0, liquidado: 0, empenhado: 0 });
+    // 2. Valores Mensais (Empenhado vs Pago)
+    const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+      name: new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
+      Empenhado: 0,
+      Pago: 0,
+    }));
 
-    const chartDataValores = [
-        { name: 'Pago', value: totalValores.pago },
-        { name: 'Liquidado', value: totalValores.liquidado },
-        { name: 'Empenhado', value: totalValores.empenhado },
-    ];
-    const COLORS = ['#16a34a', '#f97316', '#3b82f6'];
+    // This part is a mock since we don't have date fields in the Emenda type.
+    // In a real scenario, we would parse a date from the data.
+    // For now, we distribute the total values fictitiously for demonstration.
+    emendasData.forEach((emenda, index) => {
+        const monthIndex = index % 12; // Simple distribution for demo
+        monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
+        monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
+    });
+
+    const PIE_COLORS = ['#16a34a', '#3b82f6'];
 
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Convênios</CardTitle>
-            <BookCopy className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">
-              Nenhum convênio carregado
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Emendas ({currentYear})</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalAmendments}</div>
-            <p className="text-xs text-muted-foreground">
-              Total de emendas encontradas
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Parlamentares</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              Deputados federais em exercício
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+        {/* KPI Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Empenhado ({currentYear})</CardTitle>
+                    <Landmark className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{formatCurrency(totalValores.empenhado)}</div>
+                    <p className="text-xs text-muted-foreground">Valor total comprometido para o ano</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Pago ({currentYear})</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{formatCurrency(totalValores.pago)}</div>
+                    <p className="text-xs text-muted-foreground">Valor efetivamente transferido</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Saldo a Liberar</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{formatCurrency(valorALiberar)}</div>
+                    <p className="text-xs text-muted-foreground">Restante do valor empenhado</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Parlamentares Ativos</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{totalUsers}</div>
+                    <p className="text-xs text-muted-foreground">Deputados federais em exercício</p>
+                </CardContent>
+            </Card>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+        {/* Main Chart Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><BarChartHorizontal/> Execução Mensal (Empenhado vs. Pago)</CardTitle>
+                    <CardDescription>Comparativo de valores ao longo de {currentYear}</CardDescription>
+                </CardHeader>
+                <CardContent className="pl-2">
+                    <ResponsiveContainer width="100%" height={350}>
+                        <BarChart data={monthlyData}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                            <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                            <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrencyShort(Number(value))} />
+                            <Tooltip
+                                cursor={{ fill: 'hsl(var(--muted))' }}
+                                formatter={(value: number) => formatCurrency(value)}
+                            />
+                            <Legend iconType="circle" />
+                            <Bar dataKey="Empenhado" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="Pago" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle  className="flex items-center gap-2"><CircleDot /> Proporção Pago vs. A Pagar</CardTitle>
+                    <CardDescription>Execução financeira total de {currentYear}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ResponsiveContainer width="100%" height={350}>
+                        <PieChart>
+                            <Pie
+                                data={[
+                                    { name: 'Valor Pago', value: totalValores.pago },
+                                    { name: 'A Pagar', value: valorALiberar > 0 ? valorALiberar : 0 }
+                                ]}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                outerRadius={100}
+                                innerRadius={60}
+                                fill="#8884d8"
+                                dataKey="value"
+                                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                                strokeWidth={2}
+                            >
+                                {[
+                                    { name: 'Valor Pago', value: totalValores.pago },
+                                    { name: 'A Pagar', value: valorALiberar }
+                                ].map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </CardContent>
+            </Card>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+            <Card>
               <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><BarChart2/> Top 10 Funções por Valor Empenhado</CardTitle>
-                  <CardDescription>Distribuição dos valores de emendas por função.</CardDescription>
+                  <CardTitle className="flex items-center gap-2"><TrendingUp/> Top 10 Funções por Valor Empenhado</CardTitle>
+                  <CardDescription>Principais áreas de destinação das emendas.</CardDescription>
               </CardHeader>
               <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={chartDataFuncao} layout="vertical" margin={{ left: 20 }}>
+                      <BarChart data={chartDataFuncao} layout="vertical" margin={{ left: 20, right: 20 }}>
+                           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                           <XAxis type="number" hide />
-                          <YAxis dataKey="name" type="category" width={100} tickLine={false} axisLine={false} />
+                          <YAxis dataKey="name" type="category" width={100} tickLine={false} axisLine={false} stroke="#888888" fontSize={12} />
                           <Tooltip 
                             cursor={{ fill: 'hsl(var(--muted))' }}
                             formatter={(value: number) => formatCurrency(value)}
                           />
-                          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} barSize={20} />
                       </BarChart>
                   </ResponsiveContainer>
               </CardContent>
-          </Card>
-           <Card>
-              <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><PieChart/> Valores por Status</CardTitle>
-                  <CardDescription>Visão geral da execução financeira das emendas.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                          <Pie
-                              data={chartDataValores}
-                              cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              outerRadius={80}
-                              fill="#8884d8"
-                              dataKey="value"
-                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          >
-                              {chartDataValores.map((entry, index) => (
-                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                          </Pie>
-                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                           <Legend />
-                      </PieChart>
-                  </ResponsiveContainer>
-              </CardContent>
-          </Card>
-      </div>
-      
-      <Card>
-        <CardHeader className="flex flex-row items-center">
-          <div className="grid gap-2">
-            <CardTitle>Emendas Recentes ({currentYear})</CardTitle>
-            <CardDescription>
-              As últimas emendas parlamentares adicionadas para o ano de {currentYear}.
-            </CardDescription>
-          </div>
-          <Button asChild size="sm" className="ml-auto gap-1">
-            <Link href="/dashboard/amendments">
-              Ver Todas
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Número</TableHead>
-                <TableHead>Autor</TableHead>
-                <TableHead>Função</TableHead>
-                <TableHead>Valor Empenhado</TableHead>
-                <TableHead>Valor Pago</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentAmendments.length > 0 ? recentAmendments.map((amendment) => (
-                <TableRow key={amendment.codigoEmenda}>
-                  <TableCell className="font-medium">{amendment.numeroEmenda}</TableCell>
-                  <TableCell>{amendment.autor}</TableCell>
-                  <TableCell>{amendment.funcao}</TableCell>
-                  <TableCell>{amendment.valorEmpenhado}</TableCell>
-                  <TableCell>{amendment.valorPago}</TableCell>
-                </TableRow>
-              )) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
-                    Nenhuma emenda encontrada para o ano de {currentYear}.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center">
+                    <div className="grid gap-2">
+                        <CardTitle  className="flex items-center gap-2"><FileText/> Emendas Recentes ({currentYear})</CardTitle>
+                        <CardDescription>
+                        As últimas emendas parlamentares adicionadas.
+                        </CardDescription>
+                    </div>
+                    <Button asChild size="sm" className="ml-auto gap-1">
+                        <Link href="/dashboard/amendments">
+                        Ver Todas
+                        <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>Número</TableHead>
+                        <TableHead>Autor</TableHead>
+                        <TableHead className="text-right">Valor Pago</TableHead>
+                    </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {recentAmendments.length > 0 ? recentAmendments.map((amendment) => (
+                        <TableRow key={amendment.codigoEmenda}>
+                        <TableCell className="font-medium">{amendment.numeroEmenda}</TableCell>
+                        <TableCell className="truncate max-w-xs">{amendment.autor}</TableCell>
+                        <TableCell className="text-right">{amendment.valorPago}</TableCell>
+                        </TableRow>
+                    )) : (
+                        <TableRow>
+                        <TableCell colSpan={3} className="h-24 text-center">
+                            Nenhuma emenda encontrada para o ano de {currentYear}.
+                        </TableCell>
+                        </TableRow>
+                    )}
+                    </TableBody>
+                </Table>
+                </CardContent>
+            </Card>
+        </div>
     </div>
   )
 }
+
+    

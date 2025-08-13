@@ -1,4 +1,8 @@
+
+'use client';
+
 import Link from "next/link"
+import React from 'react';
 import {
   Avatar,
   AvatarFallback,
@@ -27,6 +31,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { LogOut, Settings, User } from "lucide-react"
 import { SidebarNav } from "@/components/sidebar-nav"
+import { UserProvider, useUser } from '@/context/UserContext';
+
 
 const KyodaiLogo = () => (
     <svg
@@ -46,84 +52,95 @@ const KyodaiLogo = () => (
     </svg>
   );
 
+const UserProfile = () => {
+    const { user } = useUser();
+    const nameInitials = user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'P';
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-14 w-full justify-start p-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:justify-center">
+                <Avatar className="h-8 w-8">
+                <AvatarImage src="https://placehold.co/40x40.png" alt="User" data-ai-hint="avatar" />
+                <AvatarFallback>{nameInitials}</AvatarFallback>
+                </Avatar>
+                <div className="ml-3 flex flex-col items-start group-data-[collapsible=icon]:hidden">
+                <span className="text-sm font-medium">{user.name}</span>
+                <span className="text-xs text-muted-foreground">
+                    {user.email}
+                </span>
+                </div>
+            </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" align="start" className="w-56">
+            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+                <Link href="/dashboard/profile">
+                <User className="mr-2 h-4 w-4" />
+                <span>Perfil</span>
+                </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Configurações</span>
+                </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+                <Link href="/">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+                </Link>
+            </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
-        <Sidebar>
-          <SidebarHeader className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 text-primary">
-                <KyodaiLogo />
-              </div>
-              <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                <span className="text-lg font-semibold tracking-tight">
-                  Kyodai Systems
-                </span>
-              </div>
-            </div>
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarNav />
-          </SidebarContent>
-          <SidebarFooter>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-14 w-full justify-start p-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:justify-center">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://placehold.co/40x40.png" alt="User" data-ai-hint="avatar" />
-                    <AvatarFallback>PD</AvatarFallback>
-                  </Avatar>
-                  <div className="ml-3 flex flex-col items-start group-data-[collapsible=icon]:hidden">
-                    <span className="text-sm font-medium">PAULO DANGELO DE ARAUJO</span>
-                    <span className="text-xs text-muted-foreground">
-                      univox@gmail.com
+    <UserProvider>
+        <SidebarProvider>
+        <div className="flex min-h-screen bg-background">
+            <Sidebar>
+            <SidebarHeader className="p-4">
+                <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                    <KyodaiLogo />
+                </div>
+                <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                    <span className="text-lg font-semibold tracking-tight">
+                    Kyodai Systems
                     </span>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="start" className="w-56">
-                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/profile">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Perfil</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/settings">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Configurações</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair</span>
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarFooter>
-        </Sidebar>
-        <SidebarInset>
-          <header className="flex h-14 items-center justify-between border-b bg-background px-4 lg:px-6">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1">
-              {/* Future global search or actions */}
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto p-4 md:p-6">
-            {children}
-          </main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+                </div>
+                </div>
+            </SidebarHeader>
+            <SidebarContent>
+                <SidebarNav />
+            </SidebarContent>
+            <SidebarFooter>
+                <UserProfile />
+            </SidebarFooter>
+            </Sidebar>
+            <SidebarInset>
+            <header className="flex h-14 items-center justify-between border-b bg-background px-4 lg:px-6">
+                <SidebarTrigger className="md:hidden" />
+                <div className="flex-1">
+                {/* Future global search or actions */}
+                </div>
+            </header>
+            <main className="flex-1 overflow-auto p-4 md:p-6">
+                {children}
+            </main>
+            </SidebarInset>
+        </div>
+        </SidebarProvider>
+    </UserProvider>
   )
 }

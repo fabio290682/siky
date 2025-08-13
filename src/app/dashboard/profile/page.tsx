@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/context/UserContext";
 import { User, Camera, Loader2 } from "lucide-react";
 
 const profileSchema = z.object({
@@ -32,16 +34,17 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
     const { toast } = useToast();
+    const { user, setUser } = useUser();
 
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
-        defaultValues: {
-            name: "PAULO DANGELO DE ARAUJO",
-            email: "univox@gmail.com",
-            currentPassword: "",
-            newPassword: "",
-        }
+        defaultValues: user,
     });
+    
+    // Sync form with context changes
+    useEffect(() => {
+        form.reset(user);
+    }, [user, form]);
 
     const { isSubmitting } = form.formState;
     const watchedName = form.watch("name");
@@ -53,7 +56,7 @@ export default function ProfilePage() {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        console.log(data);
+        setUser({ name: data.name, email: data.email });
 
         toast({
             title: "Perfil Atualizado",

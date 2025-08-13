@@ -9,13 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/context/ThemeContext";
 import { Settings, Bell, Palette, Globe, Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
     const { toast } = useToast();
+    const { theme, setTheme } = useTheme();
     const [isLoading, setIsLoading] = React.useState(false);
     const [settings, setSettings] = React.useState({
-        theme: 'system',
         emailNotifications: true,
         pushNotifications: false,
         language: 'pt-br'
@@ -23,7 +24,7 @@ export default function SettingsPage() {
 
     const handleSave = async () => {
         setIsLoading(true);
-        // Simulate API call
+        // Simulate API call for non-theme settings
         await new Promise(resolve => setTimeout(resolve, 1000));
         setIsLoading(false);
 
@@ -53,8 +54,8 @@ export default function SettingsPage() {
                             <p className="text-sm text-muted-foreground">Selecione o tema visual da aplicação.</p>
                         </div>
                         <Select 
-                            value={settings.theme}
-                            onValueChange={(value) => setSettings(s => ({ ...s, theme: value }))}
+                            value={theme}
+                            onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}
                         >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Selecione o tema" />

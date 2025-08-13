@@ -38,7 +38,6 @@ const menuItems = [
     icon: ExternalLink,
     external: true 
   },
-  { href: "/dashboard/sismob", label: "SISMOB", icon: Building2 },
   { href: "/dashboard/siop", label: "SIOP", icon: SlidersHorizontal },
   { href: "/dashboard/managerial-report", label: "Relatório Gerencial", icon: FileBarChart },
   { href: "/dashboard/status", label: "Status", icon: HeartPulse },

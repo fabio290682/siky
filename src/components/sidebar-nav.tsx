@@ -38,6 +38,12 @@ const menuItems = [
     icon: ExternalLink,
     external: true 
   },
+  { 
+    href: "https://investsuspaineis.saude.gov.br/extensions/CGIN_Painel_SISMOB/CGIN_Painel_SISMOB.html#GUIA01", 
+    label: "SISMOB", 
+    icon: ExternalLink,
+    external: true 
+  },
   { href: "/dashboard/siop", label: "SIOP", icon: SlidersHorizontal },
   { href: "/dashboard/managerial-report", label: "Relatório Gerencial", icon: FileBarChart },
   { href: "/dashboard/status", label: "Status", icon: HeartPulse },

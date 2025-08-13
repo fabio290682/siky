@@ -20,7 +20,47 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { ArrowUpRight, BookCopy, FileText, Users } from "lucide-react"
-import { amendments, users } from "@/lib/data"
+
+// This data is now for display purposes only.
+// In a real application, this would come from your database.
+const recentAmendments = [
+  { 
+    id: '201830490006',
+    autor: 'ABEL MESQUITA JR.',
+    funcao: 'Saúde',
+    valor: 'R$ 100.000,00',
+    status: 'Aprovada'
+  },
+  { 
+    id: '201830490004',
+    autor: 'ABEL MESQUITA JR.',
+    funcao: 'Saúde',
+    valor: 'R$ 6.486.136,00',
+    status: 'Rejeitada'
+  },
+  { 
+    id: '201930490003',
+    autor: 'ABEL MESQUITA JR.',
+    funcao: 'Saúde',
+    valor: 'R$ 7.610.387,00',
+    status: 'Aprovada'
+  },
+  { 
+    id: '201630300002',
+    autor: 'ABEL MESQUITA JR.',
+    funcao: 'Urbanismo',
+    valor: 'R$ 342.143,00',
+    status: 'Em análise'
+  },
+  { 
+    id: '201730490002',
+    autor: 'ABEL MESQUITA JR.',
+    funcao: 'Saúde',
+    valor: 'R$ 2.343.887,00',
+    status: 'Pendente'
+  },
+];
+
 
 const getAmendmentStatusVariant = (status: string) => {
   switch (status.toLowerCase()) {
@@ -38,14 +78,12 @@ const getAmendmentStatusVariant = (status: string) => {
 };
 
 export default function DashboardPage() {
-  // Optimized values for performance
-  const totalConventions = 14;
-  const activeConventions = 4;
-  const totalAmendments = 10;
-  const approvedAmendments = 3;
-  const totalUsers = users.length;
-
-  const recentAmendments = [...amendments].slice(0, 5);
+  // These values should be fetched from your database in a real application.
+  const totalConventions = 0;
+  const activeConventions = 0;
+  const totalAmendments = 0;
+  const approvedAmendments = 0;
+  const totalUsers = 1; // Starts with the first user
 
   return (
     <div className="flex flex-col gap-6">

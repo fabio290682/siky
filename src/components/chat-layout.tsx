@@ -6,16 +6,32 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
-import { users, messages as allMessages } from "@/lib/data"
 import { cn } from "@/lib/utils"
 import { Search, SendHorizonal } from "lucide-react"
 
-type User = typeof users[0]
-type Messages = typeof allMessages
+type User = {
+  id: number;
+  name: string;
+  avatar: string;
+  online: boolean;
+  lastMessage: string;
+  lastMessageTime: string;
+  unread: number;
+}
+type Message = {
+  sender: 'me' | string;
+  text: string;
+  timestamp: string;
+}
+type Messages = Record<string, Message[]>;
+
+
+const users: User[] = [];
+const allMessages: Messages = {};
 
 export function ChatLayout() {
-  const [selectedUser, setSelectedUser] = useState<User>(users[0])
-  const [messages, setMessages] = useState(allMessages[selectedUser.id as keyof Messages])
+  const [selectedUser, setSelectedUser] = useState<User | null>(users.length > 0 ? users[0] : null)
+  const [messages, setMessages] = useState<Message[]>(selectedUser ? (allMessages[selectedUser.id as keyof Messages] || []) : []);
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user)
@@ -40,7 +56,7 @@ export function ChatLayout() {
                 onClick={() => handleUserSelect(user)}
                 className={cn(
                   "flex items-center gap-3 p-4 cursor-pointer hover:bg-accent",
-                  selectedUser.id === user.id && "bg-accent"
+                  selectedUser?.id === user.id && "bg-accent"
                 )}
               >
                 <Avatar className="relative h-10 w-10">
@@ -64,6 +80,11 @@ export function ChatLayout() {
                 </div>
               </div>
             ))}
+             {users.length === 0 && (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                Nenhuma conversa encontrada.
+              </div>
+            )}
           </ScrollArea>
         </div>
       </div>

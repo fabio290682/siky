@@ -1,10 +1,24 @@
+
+"use client";
+
+import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { senators } from "@/lib/data";
 import { ArrowLeft, Mail, Phone, User, ExternalLink } from "lucide-react";
 import Link from "next/link";
+
+type Senator = {
+    id: string;
+    nome: string;
+    partido: string;
+    uf: string;
+    periodo: string;
+    telefones: string;
+    email: string;
+    foto: string;
+};
 
 const DetailItem = ({ icon, label, children }: { icon: React.ReactNode, label: string, children: React.ReactNode }) => (
     <div className="flex items-start gap-3">
@@ -16,13 +30,19 @@ const DetailItem = ({ icon, label, children }: { icon: React.ReactNode, label: s
     </div>
 );
 
-export default async function SenatorDetailPage({ params }: { params: { id: string } }) {
-    const senator = senators.find(s => s.id === params.id);
+export default function SenatorDetailPage({ params }: { params: { id: string } }) {
+    const [senator, setSenator] = React.useState<Senator | null>(null);
+
+    React.useEffect(() => {
+        // In a real app, this would fetch senator details from an API
+        // For now, it will remain null as we have no static data
+    }, [params.id]);
+
 
     if (!senator) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
-                <p className="text-xl text-muted-foreground">Senador não encontrado.</p>
+                <p className="text-xl text-muted-foreground">Carregando dados do senador...</p>
                 <Button asChild variant="link" className="mt-4">
                     <Link href="/dashboard/senators">
                         <ArrowLeft className="mr-2 h-4 w-4" />

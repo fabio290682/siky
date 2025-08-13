@@ -1,3 +1,7 @@
+
+"use client";
+
+import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,12 +20,27 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { senators } from "@/lib/data";
 import { Users, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-export default async function SenatorsPage() {
-    const senadores = senators;
+type Senator = {
+    id: string;
+    nome: string;
+    partido: string;
+    uf: string;
+    periodo: string;
+    telefones: string;
+    email: string;
+    foto: string;
+};
+
+export default function SenatorsPage() {
+    const [senadores, setSenadores] = React.useState<Senator[]>([]);
+
+    React.useEffect(() => {
+        // In a real app, this data would be fetched from an API
+        setSenadores([]);
+    }, []);
 
     return (
         <Card>

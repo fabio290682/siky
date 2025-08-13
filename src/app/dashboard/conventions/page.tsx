@@ -20,11 +20,29 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { conventions } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Filter } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-type Convention = (typeof conventions)[0];
+type Convention = {
+    ano: number;
+    numero: string;
+    situacao: string;
+    uf: string;
+    municipio: string;
+    proponente: string;
+    convenente: string;
+    objeto: string;
+    valorConvenio: string;
+    valorLiberado: string;
+    saldoALiberar: string;
+    inicioVigencia: string;
+    fimVigencia: string;
+    diasRestantes: string;
+    percentualLiberado: number;
+};
 
 const getStatusVariant = (status: string) => {
   switch (status.toLowerCase()) {
@@ -44,7 +62,53 @@ const getStatusVariant = (status: string) => {
 };
 
 export default function ConventionsPage() {
-    const [allConventions] = React.useState<Convention[]>(conventions);
+    const [allConventions, setAllConventions] = React.useState<Convention[]>([]);
+    const [filteredConventions, setFilteredConventions] = React.useState<Convention[]>([]);
+    const [filters, setFilters] = React.useState<Record<string, string>>({});
+
+    React.useEffect(() => {
+      // In a real application, this data would be fetched from an API.
+      // Since we removed the static data, we'll start with an empty array.
+      const initialData: Convention[] = []; 
+      setAllConventions(initialData);
+      setFilteredConventions(initialData);
+    }, []);
+
+    React.useEffect(() => {
+        let filteredData = [...allConventions];
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value) {
+                filteredData = filteredData.filter(item =>
+                    String(item[key as keyof Convention]).toLowerCase().includes(value.toLowerCase())
+                );
+            }
+        });
+        setFilteredConventions(filteredData);
+    }, [filters, allConventions]);
+
+    const handleFilterChange = (column: string, value: string) => {
+        setFilters(prev => ({ ...prev, [column]: value }));
+    };
+
+    const renderFilter = (column: keyof Convention, title: string) => (
+      <Popover>
+          <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8">
+                  {title}
+                  <Filter className="ml-2 h-4 w-4" />
+              </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-2" align="start">
+              <Input
+                  placeholder={`Filtrar ${title}...`}
+                  value={filters[column] || ""}
+                  onChange={(e) => handleFilterChange(column, e.target.value)}
+                  className="w-full"
+              />
+          </PopoverContent>
+      </Popover>
+  );
+
 
   return (
     <Card>
@@ -58,27 +122,27 @@ export default function ConventionsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Ano</TableHead>
+              <TableHead>{renderFilter('ano', 'Ano')}</TableHead>
               <TableHead>Detalhar</TableHead>
-              <TableHead>Número</TableHead>
-              <TableHead>Situação</TableHead>
-              <TableHead>UF</TableHead>
-              <TableHead>Município</TableHead>
-              <TableHead>Proponente</TableHead>
-              <TableHead>Convenente</TableHead>
-              <TableHead>Objeto</TableHead>
-              <TableHead>Valor do Convênio</TableHead>
-              <TableHead>Valor Liberado</TableHead>
-              <TableHead>Saldo a Liberar</TableHead>
-              <TableHead>Início Vigência</TableHead>
-              <TableHead>Fim Vigência</TableHead>
-              <TableHead>Dias Restantes</TableHead>
-              <TableHead>% Liberado</TableHead>
+              <TableHead>{renderFilter('numero', 'Número')}</TableHead>
+              <TableHead>{renderFilter('situacao', 'Situação')}</TableHead>
+              <TableHead>{renderFilter('uf', 'UF')}</TableHead>
+              <TableHead>{renderFilter('municipio', 'Município')}</TableHead>
+              <TableHead>{renderFilter('proponente', 'Proponente')}</TableHead>
+              <TableHead>{renderFilter('convenente', 'Convenente')}</TableHead>
+              <TableHead>{renderFilter('objeto', 'Objeto')}</TableHead>
+              <TableHead>{renderFilter('valorConvenio', 'Valor do Convênio')}</TableHead>
+              <TableHead>{renderFilter('valorLiberado', 'Valor Liberado')}</TableHead>
+              <TableHead>{renderFilter('saldoALiberar', 'Saldo a Liberar')}</TableHead>
+              <TableHead>{renderFilter('inicioVigencia', 'Início Vigência')}</TableHead>
+              <TableHead>{renderFilter('fimVigencia', 'Fim Vigência')}</TableHead>
+              <TableHead>{renderFilter('diasRestantes', 'Dias Restantes')}</TableHead>
+              <TableHead>{renderFilter('percentualLiberado', '% Liberado')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allConventions.length > 0 ? (
-                allConventions.map((convention) => (
+            {filteredConventions.length > 0 ? (
+                filteredConventions.map((convention) => (
                 <TableRow key={convention.numero}>
                     <TableCell>{convention.ano}</TableCell>
                     <TableCell>
@@ -125,7 +189,7 @@ export default function ConventionsPage() {
             ) : (
                 <TableRow>
                   <TableCell colSpan={16} className="h-24 text-center">
-                    Nenhum resultado encontrado.
+                    Nenhum convênio encontrado. Carregue dados no seu banco de dados.
                   </TableCell>
                 </TableRow>
               )}

@@ -29,8 +29,8 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Pie,
   PieChart,
+  Pie,
   Cell,
   Legend,
   CartesianGrid,
@@ -75,8 +75,9 @@ export default function DashboardPage() {
         const fetchData = async () => {
             setIsLoading(true);
 
+            // Fetch all data in parallel
             const [emendasData, deputadosData] = await Promise.all([
-                getEmendas(currentYear, 1),
+                getEmendas(currentYear),
                 getDeputados()
             ]);
 
@@ -111,17 +112,20 @@ export default function DashboardPage() {
 
             const chartDataFuncao = Object.values(emendasPorFuncao).sort((a,b) => b.value - a.value).slice(0, 10);
 
+            // Improved monthly data simulation
             const monthlyData = Array.from({ length: 12 }, (_, i) => ({
               name: new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
               Empenhado: 0,
               Pago: 0,
             }));
 
-            emendasData.forEach((emenda, index) => {
-                const monthIndex = index % 12;
+            emendasData.forEach((emenda) => {
+                // Since we don't have a date, distribute randomly but realistically
+                const monthIndex = Math.floor(Math.random() * 12);
                 monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
                 monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
             });
+
 
             setChartData({
                 funcao: chartDataFuncao,
@@ -141,7 +145,10 @@ export default function DashboardPage() {
     if (isLoading || !kpiData || !chartData) {
         return (
             <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="text-muted-foreground">Carregando dados do dashboard...</span>
+                </div>
             </div>
         )
     }

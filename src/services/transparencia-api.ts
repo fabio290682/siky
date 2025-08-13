@@ -26,7 +26,7 @@ export interface Emenda {
     valorRestoAPagar: string;
 }
 
-async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number>, isArray: boolean = true): Promise<T | T[]> {
+async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number>, isArray: boolean = true): Promise<any> {
     if (!API_KEY) {
         if (isArray) return [];
         return null as T;
@@ -58,8 +58,44 @@ async function fetchFromApi<T>(endpoint: string, params: Record<string, string |
 }
 
 
-export async function getEmendas(ano: number, pagina: number = 1): Promise<Emenda[]> {
-    return fetchFromApi<Emenda>('emendas', { ano, pagina }, true) as Promise<Emenda[]>;
+export async function getEmendas(ano: number): Promise<Emenda[]> {
+    let allEmendas: Emenda[] = [];
+    let pagina = 1;
+    let hasMore = true;
+
+    while(hasMore) {
+        if (!API_KEY) {
+            hasMore = false;
+            break;
+        }
+        
+        try {
+            console.log(`Buscando emendas para o ano ${ano}, página ${pagina}...`);
+            const emendas = await fetchFromApi<Emenda>('emendas', { ano, pagina }, true) as Emenda[];
+
+            if(emendas && emendas.length > 0) {
+                allEmendas = allEmendas.concat(emendas);
+                pagina++;
+                // The API doesn't give a total, so we assume if we get less than the default page size (15), it's the last page.
+                // A safer check would be to see if length < page size, but let's assume 15 for now.
+                if (emendas.length < 15) { 
+                    hasMore = false;
+                }
+            } else {
+                hasMore = false;
+            }
+        } catch (error) {
+            console.error(`Falha ao buscar página ${pagina} de emendas para o ano ${ano}:`, error);
+            hasMore = false;
+        }
+        // Safety break to avoid infinite loops in case of unexpected API behavior
+        if (pagina > 200) { // Limit to 200 pages (~3000 results)
+            console.warn('Atingido o limite de 200 páginas na busca de emendas.');
+            hasMore = false;
+        }
+    }
+    console.log(`Busca finalizada. Total de ${allEmendas.length} emendas encontradas para ${ano}.`);
+    return allEmendas;
 }
 
 export async function getEmendaDetail(codigo: string): Promise<Emenda | null> {

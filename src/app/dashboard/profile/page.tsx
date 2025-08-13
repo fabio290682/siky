@@ -1,14 +1,63 @@
 
 'use client';
 
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Camera } from "lucide-react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import { User, Camera, Loader2 } from "lucide-react";
+
+const profileSchema = z.object({
+    name: z.string().min(1, "O nome é obrigatório."),
+    email: z.string().email("Por favor, insira um email válido."),
+    currentPassword: z.string().optional(),
+    newPassword: z.string().optional(),
+}).refine(data => {
+    if (data.newPassword && !data.currentPassword) {
+        return false;
+    }
+    return true;
+}, {
+    message: "A senha atual é necessária para definir uma nova senha.",
+    path: ["currentPassword"],
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
+
 
 export default function ProfilePage() {
+    const { toast } = useToast();
+
+    const form = useForm<ProfileFormValues>({
+        resolver: zodResolver(profileSchema),
+        defaultValues: {
+            name: "João da Silva",
+            email: "joao.silva@email.com",
+            currentPassword: "",
+            newPassword: "",
+        }
+    });
+
+    const { isSubmitting } = form.formState;
+
+    const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        console.log(data);
+
+        toast({
+            title: "Perfil Atualizado",
+            description: "Suas informações foram salvas com sucesso.",
+        });
+    }
+
     return (
         <Card>
             <CardHeader>
@@ -38,33 +87,73 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                <div className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Nome Completo</Label>
-                            <Input id="name" defaultValue="João da Silva" />
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                             <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Nome Completo</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Seu Nome Completo" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input type="email" placeholder="seu@email.com" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" defaultValue="joao.silva@email.com" />
+                        <div className="grid md:grid-cols-2 gap-6">
+                             <FormField
+                                control={form.control}
+                                name="currentPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Senha Atual</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="********" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="newPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Nova Senha</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="********" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
-                    </div>
-                     <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="current-password">Senha Atual</Label>
-                            <Input id="current-password" type="password" placeholder="********" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="new-password">Nova Senha</Label>
-                            <Input id="new-password" type="password" placeholder="********" />
-                        </div>
-                    </div>
-                </div>
 
-                <div className="flex justify-end">
-                    <Button>Salvar Alterações</Button>
-                </div>
-
+                        <div className="flex justify-end">
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Salvar Alterações
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
             </CardContent>
         </Card>
     )

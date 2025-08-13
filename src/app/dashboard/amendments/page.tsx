@@ -203,7 +203,16 @@ export default function AmendmentsPage() {
                       <TableCell>{amendment.ano}</TableCell>
                       <TableCell>{amendment.tipoEmenda}</TableCell>
                       <TableCell>{amendment.autor}</TableCell>
-                      <TableCell>{amendment.numeroEmenda}</TableCell>
+                      <TableCell>
+                        <Link
+                            href={`https://portaldatransparencia.gov.br/emendas/detalhe?codigoEmenda=${amendment.codigoEmenda}&ordenarPor=data&direcao=asc`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline hover:text-primary"
+                        >
+                            {amendment.numeroEmenda}
+                        </Link>
+                      </TableCell>
                       <TableCell>{amendment.localidadeGasto}</TableCell>
                       <TableCell>{amendment.funcao}</TableCell>
                       <TableCell>{amendment.subfuncao}</TableCell>

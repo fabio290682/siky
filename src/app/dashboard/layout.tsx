@@ -76,12 +76,12 @@ export default function DashboardLayout({
                 <Button variant="ghost" className="h-14 w-full justify-start p-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:justify-center">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="https://placehold.co/40x40.png" alt="User" data-ai-hint="avatar" />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarFallback>PD</AvatarFallback>
                   </Avatar>
                   <div className="ml-3 flex flex-col items-start group-data-[collapsible=icon]:hidden">
-                    <span className="text-sm font-medium">João da Silva</span>
+                    <span className="text-sm font-medium">PAULO DANGELO DE ARAUJO</span>
                     <span className="text-xs text-muted-foreground">
-                      joao.silva@email.com
+                      univox@gmail.com
                     </span>
                   </div>
                 </Button>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -8,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { Search, SendHorizonal } from "lucide-react"
+import { users as staticUsers, messages as staticMessages } from "@/lib/data"
 
 type User = {
   id: number;
@@ -26,8 +28,8 @@ type Message = {
 type Messages = Record<string, Message[]>;
 
 
-const users: User[] = [];
-const allMessages: Messages = {};
+const users: User[] = staticUsers;
+const allMessages: Messages = staticMessages;
 
 export function ChatLayout() {
   const [selectedUser, setSelectedUser] = useState<User | null>(users.length > 0 ? users[0] : null)

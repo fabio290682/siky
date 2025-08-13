@@ -44,6 +44,10 @@ export default function ProfilePage() {
     });
 
     const { isSubmitting } = form.formState;
+    const watchedName = form.watch("name");
+    const watchedEmail = form.watch("email");
+    const nameInitials = watchedName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'P';
+
 
     const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
         // Simulate API call
@@ -73,7 +77,7 @@ export default function ProfilePage() {
                     <div className="relative">
                         <Avatar className="h-24 w-24 border">
                             <AvatarImage src="https://placehold.co/96x96.png" alt="User" data-ai-hint="avatar" />
-                            <AvatarFallback>JD</AvatarFallback>
+                            <AvatarFallback>{nameInitials}</AvatarFallback>
                         </Avatar>
                         <Button size="icon" className="absolute bottom-0 right-0 rounded-full">
                             <Camera className="h-4 w-4" />
@@ -81,8 +85,8 @@ export default function ProfilePage() {
                         </Button>
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold">João da Silva</h2>
-                        <p className="text-muted-foreground">joao.silva@email.com</p>
+                        <h2 className="text-2xl font-bold">{watchedName}</h2>
+                        <p className="text-muted-foreground">{watchedEmail}</p>
                     </div>
                 </div>
 

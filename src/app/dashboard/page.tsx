@@ -30,6 +30,7 @@ import {
   YAxis,
   Tooltip,
   Pie,
+  PieChart,
   Cell,
   Legend,
   CartesianGrid,

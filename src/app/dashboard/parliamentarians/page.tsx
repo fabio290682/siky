@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,11 @@ import { Users, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export default async function ParliamentariansPage() {
-    const { dados: deputados } = await getDeputados();
+    const { dados: deputados } = await getDeputados(new URLSearchParams({
+        ordem: 'ASC',
+        ordenarPor: 'nome',
+        itens: '100'
+    }));
 
     return (
         <Card>

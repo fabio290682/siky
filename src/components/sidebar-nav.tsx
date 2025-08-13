@@ -32,7 +32,6 @@ const menuItems = [
   { href: "/dashboard/parliamentarians", label: "Parlamentares", icon: Users },
   { href: "/dashboard/senators", label: "Senadores", icon: Users },
   { href: "/dashboard/parties", label: "Partidos", icon: Building },
-  { href: "/dashboard/investsus", label: "InvestSUS", icon: Briefcase },
   { 
     href: "https://investsuspaineis.saude.gov.br/extensions/CGIN_Painel_FAF/CGIN_Painel_FAF.html", 
     label: "Repasses", 

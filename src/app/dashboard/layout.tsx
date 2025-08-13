@@ -34,7 +34,7 @@ import { SidebarNav } from "@/components/sidebar-nav"
 import { UserProvider, useUser } from '@/context/UserContext';
 
 
-const KyodaiLogo = () => (
+const AppLogo = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -112,11 +112,11 @@ export default function DashboardLayout({
             <SidebarHeader className="p-4">
                 <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 text-primary">
-                    <KyodaiLogo />
+                    <AppLogo />
                 </div>
                 <div className="flex flex-col group-data-[collapsible=icon]:hidden">
                     <span className="text-lg font-semibold tracking-tight">
-                    Kyodai Systems
+                    III Brasil
                     </span>
                 </div>
                 </div>

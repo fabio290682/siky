@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const KyodaiLogo = () => (
+const AppLogo = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="48"
@@ -52,10 +52,10 @@ export default function LoginPage() {
         <Card className="shadow-2xl">
           <CardHeader className="space-y-1 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <KyodaiLogo />
+              <AppLogo />
             </div>
             <CardTitle className="text-3xl font-bold tracking-tight">
-              Kyodai Systems
+              III Brasil
             </CardTitle>
             <CardDescription>
               Tecnologia que conecta e transforma.

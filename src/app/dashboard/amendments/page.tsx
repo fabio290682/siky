@@ -18,52 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { AmendmentSummarizer } from "@/components/amendment-summarizer";
 import { getEmendas, type Emenda } from "@/services/transparencia-api";
-import { Filter, Search } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-
-const TableHeaderCell = ({
-  children,
-  filterValue,
-  onFilterChange,
-}: {
-  children: React.ReactNode;
-  filterValue: string;
-  onFilterChange: (value: string) => void;
-}) => (
-  <TableHead>
-    <div className="flex items-center gap-2">
-      {children}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-6 w-6">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="p-2">
-          <div className="flex items-center gap-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Filtrar..."
-              value={filterValue}
-              onChange={(e) => onFilterChange(e.target.value)}
-              className="h-8"
-            />
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  </TableHead>
-);
 
 const parseCurrency = (value: string) => {
   if (!value || typeof value !== "string") return 0;
@@ -92,47 +50,14 @@ const calculateAmendmentValues = (emenda: Emenda) => {
 
 export default function AmendmentsPage() {
   const [amendments, setAmendments] = React.useState<Emenda[]>([]);
-  const [filteredAmendments, setFilteredAmendments] = React.useState<Emenda[]>([]);
-  const [filters, setFilters] = React.useState({
-    ano: "",
-    tipoEmenda: "",
-    autor: "",
-    numeroEmenda: "",
-    localidadeGasto: "",
-    funcao: "",
-    subfuncao: "",
-    valorEmpenhado: "",
-    valorPago: "",
-  });
 
   React.useEffect(() => {
     async function fetchData() {
       const data = await getEmendas(2023);
       setAmendments(data);
-      setFilteredAmendments(data);
     }
     fetchData();
   }, []);
-
-  const handleFilterChange = (column: keyof typeof filters, value: string) => {
-    setFilters((prev) => ({ ...prev, [column]: value }));
-  };
-  
-  React.useEffect(() => {
-    let filteredData = [...amendments];
-    
-    (Object.keys(filters) as Array<keyof typeof filters>).forEach((key) => {
-      const filterValue = filters[key]?.toLowerCase();
-      if (filterValue) {
-        filteredData = filteredData.filter((amendment) => {
-          const amendmentValue = String(amendment[key as keyof Emenda] ?? '').toLowerCase();
-          return amendmentValue.includes(filterValue);
-        });
-      }
-    });
-
-    setFilteredAmendments(filteredData);
-  }, [filters, amendments]);
 
   return (
     <div className="space-y-6">
@@ -150,67 +75,22 @@ export default function AmendmentsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Detalhar</TableHead>
-                <TableHeaderCell
-                  filterValue={filters.ano}
-                  onFilterChange={(value) => handleFilterChange("ano", value)}
-                >
-                  Ano Emenda
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.tipoEmenda}
-                  onFilterChange={(value) => handleFilterChange("tipoEmenda", value)}
-                >
-                  Tipo Emenda
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.autor}
-                  onFilterChange={(value) => handleFilterChange("autor", value)}
-                >
-                  Autor da Emenda
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.numeroEmenda}
-                  onFilterChange={(value) => handleFilterChange("numeroEmenda", value)}
-                >
-                  Número da Emenda
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.localidadeGasto}
-                  onFilterChange={(value) => handleFilterChange("localidadeGasto", value)}
-                >
-                  Localidade do Gasto
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.funcao}
-                  onFilterChange={(value) => handleFilterChange("funcao", value)}
-                >
-                  Função
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.subfuncao}
-                  onFilterChange={(value) => handleFilterChange("subfuncao", value)}
-                >
-                  Subfunção
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.valorEmpenhado}
-                  onFilterChange={(value) => handleFilterChange("valorEmpenhado", value)}
-                >
-                  Valor Empenhado
-                </TableHeaderCell>
-                <TableHeaderCell
-                  filterValue={filters.valorPago}
-                  onFilterChange={(value) => handleFilterChange("valorPago", value)}
-                >
-                  Valor Pago
-                </TableHeaderCell>
+                <TableHead>Ano Emenda</TableHead>
+                <TableHead>Tipo Emenda</TableHead>
+                <TableHead>Autor da Emenda</TableHead>
+                <TableHead>Número da Emenda</TableHead>
+                <TableHead>Localidade do Gasto</TableHead>
+                <TableHead>Função</TableHead>
+                <TableHead>Subfunção</TableHead>
+                <TableHead>Valor Empenhado</TableHead>
+                <TableHead>Valor Pago</TableHead>
                 <TableHead>Valor à Liberar</TableHead>
                 <TableHead>Porcentagem</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAmendments.length > 0 ? (
-                filteredAmendments.map((amendment) => {
+              {amendments.length > 0 ? (
+                amendments.map((amendment) => {
                   const { valorLiberar, porcentagem } =
                     calculateAmendmentValues(amendment);
                   return (

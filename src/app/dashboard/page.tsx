@@ -1,4 +1,6 @@
 
+"use client"
+
 import Link from "next/link"
 import {
   Card,
@@ -16,9 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp, CircleDot, BarChartHorizontal } from "lucide-react"
+import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp, CircleDot, BarChartHorizontal, Loader2 } from "lucide-react"
 import { getEmendas, type Emenda } from "@/services/transparencia-api"
 import { getDeputados } from "@/services/camara-api"
+import * as React from "react"
 import {
   Bar,
   BarChart,
@@ -61,56 +64,88 @@ const parseCurrency = (value: string) => {
 };
 
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [kpiData, setKpiData] = React.useState<any>(null);
+    const [chartData, setChartData] = React.useState<any>(null);
     const currentYear = new Date().getFullYear();
-    const [emendasData, deputadosData] = await Promise.all([
-        getEmendas(currentYear, 1), // Note: This might not fetch ALL emendas if pagination is needed.
-        getDeputados()
-    ]);
-    
-    const recentAmendments = emendasData.slice(0, 5);
-    const totalUsers = deputadosData.dados.length;
 
-    // --- KPI and Chart Data Processing ---
-    
-    const totalValores = emendasData.reduce((acc, emenda) => {
-        acc.pago += parseCurrency(emenda.valorPago);
-        acc.empenhado += parseCurrency(emenda.valorEmpenhado);
-        return acc;
-    }, { pago: 0, empenhado: 0 });
+    React.useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
 
-    const valorALiberar = totalValores.empenhado - totalValores.pago;
+            const [emendasData, deputadosData] = await Promise.all([
+                getEmendas(currentYear, 1), 
+                getDeputados()
+            ]);
 
-    // 1. Emendas por Função (Top 10)
-    const emendasPorFuncao = emendasData.reduce((acc, emenda) => {
-        const funcao = emenda.funcao || 'Não informada';
-        if (!acc[funcao]) {
-            acc[funcao] = { name: funcao, value: 0 };
-        }
-        acc[funcao].value += parseCurrency(emenda.valorEmpenhado);
-        return acc;
-    }, {} as Record<string, {name: string, value: number}>);
+            const totalUsers = deputadosData.dados.length;
 
-    const chartDataFuncao = Object.values(emendasPorFuncao).sort((a,b) => b.value - a.value).slice(0, 10);
-    
-    // 2. Valores Mensais (Empenhado vs Pago)
-    const monthlyData = Array.from({ length: 12 }, (_, i) => ({
-      name: new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
-      Empenhado: 0,
-      Pago: 0,
-    }));
+            const totalValores = emendasData.reduce((acc, emenda) => {
+                acc.pago += parseCurrency(emenda.valorPago);
+                acc.empenhado += parseCurrency(emenda.valorEmpenhado);
+                return acc;
+            }, { pago: 0, empenhado: 0 });
+            
+            const valorALiberar = totalValores.empenhado - totalValores.pago;
 
-    // This part is a mock since we don't have date fields in the Emenda type.
-    // In a real scenario, we would parse a date from the data.
-    // For now, we distribute the total values fictitiously for demonstration.
-    emendasData.forEach((emenda, index) => {
-        const monthIndex = index % 12; // Simple distribution for demo
-        monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
-        monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
-    });
+            setKpiData({
+                totalEmpenhado: totalValores.empenhado,
+                totalPago: totalValores.pago,
+                valorALiberar,
+                totalUsers,
+                recentAmendments: emendasData.slice(0, 5)
+            });
+
+
+            // Chart data processing
+            const emendasPorFuncao = emendasData.reduce((acc, emenda) => {
+                const funcao = emenda.funcao || 'Não informada';
+                if (!acc[funcao]) {
+                    acc[funcao] = { name: funcao, value: 0 };
+                }
+                acc[funcao].value += parseCurrency(emenda.valorEmpenhado);
+                return acc;
+            }, {} as Record<string, {name: string, value: number}>);
+
+            const chartDataFuncao = Object.values(emendasPorFuncao).sort((a,b) => b.value - a.value).slice(0, 10);
+            
+            const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+              name: new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
+              Empenhado: 0,
+              Pago: 0,
+            }));
+
+            emendasData.forEach((emenda, index) => {
+                const monthIndex = index % 12; 
+                monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
+                monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
+            });
+
+            setChartData({
+                funcao: chartDataFuncao,
+                monthly: monthlyData,
+                pie: [
+                    { name: 'Valor Pago', value: totalValores.pago },
+                    { name: 'A Pagar', value: valorALiberar > 0 ? valorALiberar : 0 }
+                ]
+            });
+            
+            setIsLoading(false);
+        };
+
+        fetchData();
+    }, [currentYear]);
+
+    if (isLoading || !kpiData || !chartData) {
+        return (
+            <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
 
     const PIE_COLORS = ['#16a34a', '#3b82f6'];
-
 
   return (
     <div className="flex flex-col gap-6">
@@ -122,7 +157,7 @@ export default async function DashboardPage() {
                     <Landmark className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{formatCurrency(totalValores.empenhado)}</div>
+                    <div className="text-2xl font-bold">{formatCurrency(kpiData.totalEmpenhado)}</div>
                     <p className="text-xs text-muted-foreground">Valor total comprometido para o ano</p>
                 </CardContent>
             </Card>
@@ -132,7 +167,7 @@ export default async function DashboardPage() {
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{formatCurrency(totalValores.pago)}</div>
+                    <div className="text-2xl font-bold">{formatCurrency(kpiData.totalPago)}</div>
                     <p className="text-xs text-muted-foreground">Valor efetivamente transferido</p>
                 </CardContent>
             </Card>
@@ -142,7 +177,7 @@ export default async function DashboardPage() {
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{formatCurrency(valorALiberar)}</div>
+                    <div className="text-2xl font-bold">{formatCurrency(kpiData.valorALiberar)}</div>
                     <p className="text-xs text-muted-foreground">Restante do valor empenhado</p>
                 </CardContent>
             </Card>
@@ -152,7 +187,7 @@ export default async function DashboardPage() {
                     <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{totalUsers}</div>
+                    <div className="text-2xl font-bold">{kpiData.totalUsers}</div>
                     <p className="text-xs text-muted-foreground">Deputados federais em exercício</p>
                 </CardContent>
             </Card>
@@ -167,7 +202,7 @@ export default async function DashboardPage() {
                 </CardHeader>
                 <CardContent className="pl-2">
                     <ResponsiveContainer width="100%" height={350}>
-                        <BarChart data={monthlyData}>
+                        <BarChart data={chartData.monthly}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                             <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrencyShort(Number(value))} />
@@ -191,10 +226,7 @@ export default async function DashboardPage() {
                     <ResponsiveContainer width="100%" height={350}>
                         <PieChart>
                             <Pie
-                                data={[
-                                    { name: 'Valor Pago', value: totalValores.pago },
-                                    { name: 'A Pagar', value: valorALiberar > 0 ? valorALiberar : 0 }
-                                ]}
+                                data={chartData.pie}
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
@@ -205,10 +237,7 @@ export default async function DashboardPage() {
                                 label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
                                 strokeWidth={2}
                             >
-                                {[
-                                    { name: 'Valor Pago', value: totalValores.pago },
-                                    { name: 'A Pagar', value: valorALiberar }
-                                ].map((entry, index) => (
+                                {chartData.pie.map((entry:any, index:number) => (
                                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                                 ))}
                             </Pie>
@@ -228,7 +257,7 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={chartDataFuncao} layout="vertical" margin={{ left: 20, right: 20 }}>
+                      <BarChart data={chartData.funcao} layout="vertical" margin={{ left: 20, right: 20 }}>
                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                           <XAxis type="number" hide />
                           <YAxis dataKey="name" type="category" width={100} tickLine={false} axisLine={false} stroke="#888888" fontSize={12} />
@@ -266,7 +295,7 @@ export default async function DashboardPage() {
                     </TableRow>
                     </TableHeader>
                     <TableBody>
-                    {recentAmendments.length > 0 ? recentAmendments.map((amendment) => (
+                    {kpiData.recentAmendments.length > 0 ? kpiData.recentAmendments.map((amendment: Emenda) => (
                         <TableRow key={amendment.codigoEmenda}>
                         <TableCell className="font-medium">{amendment.numeroEmenda}</TableCell>
                         <TableCell className="truncate max-w-xs">{amendment.autor}</TableCell>
@@ -287,5 +316,3 @@ export default async function DashboardPage() {
     </div>
   )
 }
-
-    

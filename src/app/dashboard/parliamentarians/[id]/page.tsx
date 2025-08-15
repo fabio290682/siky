@@ -31,7 +31,7 @@ export default async function ParliamentarianDetailPage({ params }: { params: { 
 
     const [deputadoResponse, despesasResponse, orgaosResponse, frentesResponse] = await Promise.all([
         getDeputadoDetalhes(deputadoId),
-        getDeputadoDespesas(deputadoId),
+        getDeputadoDespesas(deputadoId, 'dataDocumento'),
         getDeputadoOrgaos(deputadoId),
         getDeputadoFrentes(deputadoId)
     ]);

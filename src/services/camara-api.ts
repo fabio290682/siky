@@ -1,4 +1,5 @@
 
+
 'use server';
 
 const API_BASE_URL = 'https://dadosabertos.camara.leg.br/api/v2';
@@ -167,7 +168,16 @@ async function fetchWithCache(url: string, options?: RequestInit) {
 
 
 export async function getDeputados(params?: URLSearchParams): Promise<DeputadosResponse> {
-  const url = `${API_BASE_URL}/deputados?${params?.toString() || ''}`;
+  const defaultParams = new URLSearchParams({
+    ordem: 'ASC',
+    ordenarPor: 'nome',
+    itens: '100'
+  });
+  const mergedParams = new URLSearchParams({
+    ...Object.fromEntries(defaultParams),
+    ...Object.fromEntries(params || new URLSearchParams()),
+  })
+  const url = `${API_BASE_URL}/deputados?${mergedParams.toString()}`;
   const data = await fetchWithCache(url);
   return data || { dados: [], links: [] };
 }
@@ -178,8 +188,8 @@ export async function getDeputadoDetalhes(id: number): Promise<DeputadoDetalhesR
     return data;
 }
 
-export async function getDeputadoDespesas(id: number): Promise<DespesasResponse> {
-    const url = `${API_BASE_URL}/deputados/${id}/despesas?ordem=DESC&ordenarPor=ano&itens=100`;
+export async function getDeputadoDespesas(id: number, orderBy: 'dataDocumento' | 'ano' = 'dataDocumento'): Promise<DespesasResponse> {
+    const url = `${API_BASE_URL}/deputados/${id}/despesas?ordem=DESC&ordenarPor=${orderBy}&itens=100`;
     const data = await fetchWithCache(url);
     return data || { dados: [], links: [] };
 }

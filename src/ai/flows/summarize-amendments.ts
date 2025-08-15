@@ -10,14 +10,10 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import type { Emenda } from '@/services/transparencia-api';
 
 const SummarizeAmendmentsInputSchema = z.object({
-  apiData: z
-    .string()
-    .describe("Details retrieved from API integrations, such as convention and parliamentary amendment data from the Transparency Portal."),
-  messageHistory: z
-    .string()
-    .describe("A summary of relevant message histories."),
+  amendments: z.array(z.any()).describe("A list of amendment objects to be summarized."),
 });
 export type SummarizeAmendmentsInput = z.infer<typeof SummarizeAmendmentsInputSchema>;
 
@@ -34,14 +30,17 @@ export async function summarizeAmendments(input: SummarizeAmendmentsInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'summarizeAmendmentsPrompt',
-  input: {schema: SummarizeAmendmentsInputSchema},
+  input: {schema: z.object({
+    amendmentsData: z.string()
+  })},
   output: {schema: SummarizeAmendmentsOutputSchema},
   prompt: `You are an AI assistant that summarizes parliamentary amendments.
 
-  Analyze the following data retrieved from API integrations and message histories to provide a clear and concise summary of the amendments.
+  Analyze the following JSON data which contains a list of parliamentary amendments and provide a clear and concise summary. 
+  Focus on the key aspects such as the total value of the amendments, the main functions/areas they are destined for, and any other relevant patterns you identify.
 
-  API Data: {{{apiData}}}
-  Message History: {{{messageHistory}}}
+  Amendments Data:
+  {{{amendmentsData}}}
 
   Summary:`,
 });
@@ -52,8 +51,11 @@ const summarizeAmendmentsFlow = ai.defineFlow(
     inputSchema: SummarizeAmendmentsInputSchema,
     outputSchema: SummarizeAmendmentsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async ({amendments}) => {
+
+    const amendmentsData = JSON.stringify(amendments, null, 2);
+
+    const {output} = await prompt({amendmentsData});
     return output!;
   }
 );

@@ -127,7 +127,11 @@ export default function AmendmentsPage() {
 
   return (
     <div className="space-y-6">
-      <AmendmentSummarizer />
+      <AmendmentSummarizer 
+        amendments={allAmendments}
+        year={selectedYear}
+        isLoadingAmendments={isLoading}
+      />
 
       <Card>
         <CardHeader>

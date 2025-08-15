@@ -8,6 +8,6 @@ export async function handleSummarize(input: SummarizeAmendmentsInput) {
     return { success: true, summary: result.summary }
   } catch (error) {
     console.error("Error summarizing amendments:", error)
-    return { success: false, error: "Falha ao gerar o resumo. Tente novamente." }
+    return { success: false, error: "Não foi possível gerar o resumo. Tente novamente." }
   }
 }

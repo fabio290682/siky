@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ArrowUpRight, DollarSign, Users, Landmark, FileText } from "lucide-react"
+import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp } from "lucide-react"
 import { getEmendas, type Emenda } from "@/services/transparencia-api"
 import { getDeputados } from "@/services/camara-api"
 import { DashboardClientContent } from "@/components/dashboard-client-content";

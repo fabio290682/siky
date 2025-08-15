@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "npm-run-all --parallel dev:*",
+    "dev:next": "next dev",
+    "dev:api": "ts-node-dev --respawn --transpile-only src/api/index.ts",
+    "build": "npm-run-all build:*",
+    "build:next": "next build",
+    "build:api": "tsc -p api/tsconfig.json",
+    "start": "npm-run-all --parallel start:*",
+    "start:next": "next start",
+    "start:api": "node dist/api/index.js",
     "lint": "next lint",
     "seed": "node -r dotenv/config ./scripts/seed.js"
   },

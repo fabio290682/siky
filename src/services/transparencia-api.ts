@@ -1,9 +1,10 @@
 
 'use server';
+import 'dotenv/config';
 
 // NOTE: The API key needs to be configured in your environment variables.
 // You can get a key from: https://portaldatransparencia.gov.br/api-de-dados
-const API_KEY = "99f10a688a8421cf108943301d711160";
+const API_KEY = process.env.TRANSPARENCIA_API_KEY;
 const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
 
 if (!API_KEY) {
@@ -26,10 +27,9 @@ export interface Emenda {
     valorRestoAPagar: string;
 }
 
-async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number>, isArray: boolean = true): Promise<T | T[]> {
+async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number | undefined>, isArray: boolean = true): Promise<T[]> {
     if (!API_KEY) {
-        if (isArray) return [];
-        return null as T;
+        return [];
     }
     const url = new URL(`${API_BASE_URL}/${endpoint}`);
     Object.entries(params).forEach(([key, value]) => {
@@ -45,15 +45,13 @@ async function fetchFromApi<T>(endpoint: string, params: Record<string, string |
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Erro na API: ${response.status} ${errorText}`);
-            if (isArray) return [];
-            return null as T;
+            return [];
         }
 
         return response.json();
     } catch (error) {
         console.error(`Falha ao buscar dados da API para o endpoint ${endpoint}:`, error);
-        if (isArray) return [];
-        return null as T;
+        return [];
     }
 }
 
@@ -64,10 +62,11 @@ export async function getEmendas(params: { ano?: number; pagina?: number; autor?
         autor: params.autor,
         numeroEmenda: params.numeroEmenda
     };
-    return fetchFromApi<Emenda>('emendas', endpointParams, true) as Promise<Emenda[]>;
+    return fetchFromApi<Emenda>('emendas', endpointParams, true);
 }
 
 export async function getEmendaDetail(codigo: string): Promise<Emenda | null> {
     if (!codigo) return null;
-    return fetchFromApi<Emenda>(`emendas/${codigo}`, {}, false) as Promise<Emenda | null>;
+    const results = await fetchFromApi<Emenda>(`emendas/${codigo}`, {}, false);
+    return (results as Emenda[]).length > 0 ? results[0] : null;
 }

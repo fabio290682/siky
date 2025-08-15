@@ -55,7 +55,7 @@ export default function LoginPage() {
               <AppLogo />
             </div>
             <CardTitle className="text-3xl font-bold tracking-tight">
-              III Brasil
+              IntegraGov
             </CardTitle>
             <CardDescription>
               Tecnologia que conecta e transforma.

@@ -9,7 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SlidersHorizontal, ArrowUpRight, DollarSign, Target, Landmark } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SlidersHorizontal, ArrowUpRight, DollarSign, Target, Landmark, Search } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
@@ -41,6 +43,15 @@ const kpiData = [
 ]
 
 export default function SiopPage() {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      const searchUrl = `https://portaldatransparencia.gov.br/busca/resultados?termo=${encodeURIComponent(searchTerm)}`;
+      window.open(searchUrl, "_blank");
+    }
+  }
  
   return (
     <div className="space-y-6">
@@ -51,26 +62,29 @@ export default function SiopPage() {
               SIOP - Sistema Integrado de Planejamento e Orçamento
           </CardTitle>
           <CardDescription>
-              O SIOP é a ferramenta do governo federal brasileiro que centraliza o planejamento e a execução do orçamento público, oferecendo transparência e acesso aos dados orçamentários.
+              O SIOP é a ferramenta do governo federal que centraliza o planejamento e a execução do orçamento. Consulte os dados via Portal da Transparência.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-6 border rounded-lg bg-background/50">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                    <h3 className="text-lg font-semibold text-primary">Acesse os Dados Oficiais</h3>
-                    <p className="text-muted-foreground mt-1 max-w-2xl">
-                        Explore os painéis, relatórios e dados detalhados diretamente no portal oficial do SIOP para obter informações atualizadas sobre o orçamento da União.
-                    </p>
-                </div>
-                <Button asChild>
-                    <Link href="https://www.gov.br/planejamento/pt-br/assuntos/orcamento/siop" target="_blank" rel="noopener noreferrer">
-                        Acessar Portal do SIOP
-                        <ArrowUpRight className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
+          <form onSubmit={handleSearch} className="p-6 border rounded-lg bg-background/50">
+            <Label htmlFor="siop-search" className="text-lg font-semibold text-primary">Buscar no Orçamento Federal</Label>
+            <p className="text-muted-foreground mt-1 mb-4">
+              Pesquise por programas, ações, órgãos, ou qualquer termo relacionado ao orçamento.
+            </p>
+            <div className="flex w-full max-w-lg items-center space-x-2">
+              <Input
+                id="siop-search"
+                type="text"
+                placeholder="Ex: Saúde Indígena, 21A2..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Button type="submit">
+                <Search className="mr-2 h-4 w-4" />
+                Buscar
+              </Button>
             </div>
-          </div>
+          </form>
         </CardContent>
       </Card>
       
@@ -91,12 +105,34 @@ export default function SiopPage() {
 
        <Card>
         <CardHeader>
-          <CardTitle>Sobre a Integração</CardTitle>
+          <CardTitle>Links Úteis e Recursos</CardTitle>
+          <CardDescription>Acesse os portais oficiais para informações detalhadas e dados brutos.</CardDescription>
         </CardHeader>
-        <CardContent>
-            <p className="text-muted-foreground">
-                Atualmente, a integração direta com a API do SIOP está em desenvolvimento. Para realizar consultas e extrair dados detalhados, recomendamos o uso do portal oficial. Futuras versões desta aplicação permitirão a conexão direta para visualização de dados orçamentários personalizados.
-            </p>
+        <CardContent className="grid md:grid-cols-2 gap-4">
+            <div className="p-4 border rounded-lg flex items-center justify-between">
+                <div>
+                    <h3 className="font-semibold">Portal do SIOP</h3>
+                    <p className="text-sm text-muted-foreground">Painéis e relatórios oficiais.</p>
+                </div>
+                <Button asChild variant="outline">
+                    <Link href="https://www.gov.br/planejamento/pt-br/assuntos/orcamento/siop" target="_blank" rel="noopener noreferrer">
+                        Acessar Portal
+                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+            </div>
+            <div className="p-4 border rounded-lg flex items-center justify-between">
+                 <div>
+                    <h3 className="font-semibold">API de Emendas</h3>
+                    <p className="text-sm text-muted-foreground">Acesso para desenvolvedores.</p>
+                </div>
+                 <Button asChild variant="outline">
+                    <Link href="https://www.siop.planejamento.gov.br/modulo/main/static/api-explorer.html#impositivo/emendas" target="_blank" rel="noopener noreferrer">
+                        Explorar API
+                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+            </div>
         </CardContent>
       </Card>
     </div>

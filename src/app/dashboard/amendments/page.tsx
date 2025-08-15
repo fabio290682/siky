@@ -167,7 +167,7 @@ export default function AmendmentsPage() {
                 <TableHead>{renderFilter('ano', 'Ano Emenda')}</TableHead>
                 <TableHead>{renderFilter('tipoEmenda', 'Tipo Emenda')}</TableHead>
                 <TableHead>{renderFilter('autor', 'Autor da Emenda')}</TableHead>
-                <TableHead>{renderFilter('numeroEmenda', 'Número da Emenda')}</TableHead>
+                <TableHead>{renderFilter('codigoEmenda', 'Número da Emenda')}</TableHead>
                 <TableHead>{renderFilter('localidadeGasto', 'Localidade do Gasto')}</TableHead>
                 <TableHead>{renderFilter('funcao', 'Função')}</TableHead>
                 <TableHead>{renderFilter('subfuncao', 'Subfunção')}</TableHead>
@@ -214,7 +214,7 @@ export default function AmendmentsPage() {
                             rel="noopener noreferrer"
                             className="underline hover:text-primary"
                         >
-                            {amendment.numeroEmenda}
+                            {amendment.codigoEmenda}
                         </Link>
                       </TableCell>
                       <TableCell>{amendment.localidadeGasto}</TableCell>

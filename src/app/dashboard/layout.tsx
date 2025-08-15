@@ -129,13 +129,15 @@ export default function DashboardLayout({
             </SidebarFooter>
             </Sidebar>
             <SidebarInset>
-            <header className="flex h-14 items-center justify-between border-b bg-background px-4 lg:px-6">
-                <SidebarTrigger className="md:hidden" />
+            <header className="flex h-14 items-center justify-between border-b bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))] px-4 lg:px-6 shadow-md">
+                <SidebarTrigger className="md:hidden text-primary-foreground" />
                 <div className="flex-1">
-                {/* Future global search or actions */}
+                 <h1 className="text-lg font-semibold text-primary-foreground">
+                    Dashboard
+                 </h1>
                 </div>
             </header>
-            <main className="flex-1 overflow-auto p-4 md:p-6">
+            <main className="flex-1 overflow-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900/20">
                 {children}
             </main>
             </SidebarInset>

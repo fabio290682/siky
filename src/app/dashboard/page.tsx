@@ -19,20 +19,8 @@ import {
 import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp, CircleDot, BarChartHorizontal } from "lucide-react"
 import { getEmendas, type Emenda } from "@/services/transparencia-api"
 import { getDeputados } from "@/services/camara-api"
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-  CartesianGrid,
-} from "recharts"
 import { DashboardClientContent } from "@/components/dashboard-client-content";
+import { cn } from "@/lib/utils";
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -48,11 +36,25 @@ const parseCurrency = (value: string) => {
     return parseFloat(value.replace("R$ ", "").replace(/\./g, "").replace(",", "."));
 };
 
+const KpiCard = ({ title, value, description, icon: Icon, className, delay = 0 }: { title: string, value: string, description: string, icon: React.ElementType, className?: string, delay?: number }) => (
+    <div className="animate-fade-in" style={{ animationDelay: `${delay}s` }}>
+        <Card className={cn("card-custom text-white h-full transition-transform transform-gpu hover:-translate-y-1 hover:shadow-2xl", className)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                <Icon className="h-4 w-4 text-white/80" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{value}</div>
+                <p className="text-xs text-white/80">{description}</p>
+            </CardContent>
+        </Card>
+    </div>
+);
+
 
 export default async function DashboardPage() {
     const currentYear = new Date().getFullYear();
 
-    // Fetch all data in parallel
     const [emendasData, deputadosData] = await Promise.all([
         getEmendas(currentYear),
         getDeputados()
@@ -76,20 +78,6 @@ export default async function DashboardPage() {
         recentAmendments: emendasData.slice(0, 5)
     };
 
-
-    // Chart data processing
-    const emendasPorFuncao = emendasData.reduce((acc, emenda) => {
-        const funcao = emenda.funcao || 'Não informada';
-        if (!acc[funcao]) {
-            acc[funcao] = { name: funcao, value: 0 };
-        }
-        acc[funcao].value += parseCurrency(emenda.valorEmpenhado);
-        return acc;
-    }, {} as Record<string, {name: string, value: number}>);
-
-    const chartDataFuncao = Object.values(emendasPorFuncao).sort((a,b) => b.value - a.value).slice(0, 10);
-
-    // Improved monthly data simulation
     const monthlyData = Array.from({ length: 12 }, (_, i) => ({
       name: new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
       Empenhado: 0,
@@ -97,82 +85,80 @@ export default async function DashboardPage() {
     }));
 
     emendasData.forEach((emenda) => {
-        // Since we don't have a date, distribute randomly
         const monthIndex = Math.floor(Math.random() * 12);
         monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
         monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
     });
 
-
     const chartData = {
-        funcao: chartDataFuncao,
         monthly: monthlyData,
         pie: [
             { name: 'Valor Pago', value: totalValores.pago },
             { name: 'A Pagar', value: valorALiberar > 0 ? valorALiberar : 0 }
-        ]
+        ],
+        funcao: emendasData.reduce((acc, emenda) => {
+            const funcao = emenda.funcao || 'Não informada';
+            if (!acc[funcao]) {
+                acc[funcao] = { name: funcao, value: 0 };
+            }
+            acc[funcao].value += parseCurrency(emenda.valorEmpenhado);
+            return acc;
+        }, {} as Record<string, {name: string, value: number}>)
     };
+
+    const chartDataFuncao = Object.values(chartData.funcao).sort((a,b) => b.value - a.value).slice(0, 10);
 
   return (
     <div className="flex flex-col gap-6">
-        {/* KPI Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Empenhado ({currentYear})</CardTitle>
-                    <Landmark className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{formatCurrency(kpiData.totalEmpenhado)}</div>
-                    <p className="text-xs text-muted-foreground">Valor total comprometido para o ano</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Pago ({currentYear})</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{formatCurrency(kpiData.totalPago)}</div>
-                    <p className="text-xs text-muted-foreground">Valor efetivamente transferido</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Saldo a Liberar</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{formatCurrency(kpiData.valorALiberar)}</div>
-                    <p className="text-xs text-muted-foreground">Restante do valor empenhado</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Parlamentares Ativos</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{kpiData.totalUsers}</div>
-                    <p className="text-xs text-muted-foreground">Deputados federais em exercício</p>
-                </CardContent>
-            </Card>
+            <KpiCard 
+                title={`Total Empenhado (${currentYear})`}
+                value={formatCurrency(kpiData.totalEmpenhado)}
+                description="Valor total comprometido para o ano"
+                icon={Landmark}
+                className="bg-[hsl(var(--primary))]"
+                delay={0}
+            />
+             <KpiCard 
+                title={`Total Pago (${currentYear})`}
+                value={formatCurrency(kpiData.totalPago)}
+                description="Valor efetivamente transferido"
+                icon={DollarSign}
+                className="bg-[hsl(var(--accent))]"
+                delay={0.2}
+            />
+             <KpiCard 
+                title="Saldo a Liberar"
+                value={formatCurrency(kpiData.valorALiberar)}
+                description="Restante do valor empenhado"
+                icon={TrendingUp}
+                className="bg-warning-custom"
+                delay={0.4}
+            />
+             <KpiCard 
+                title="Parlamentares Ativos"
+                value={`${kpiData.totalUsers}`}
+                description="Deputados federais em exercício"
+                icon={Users}
+                className="bg-info-custom"
+                delay={0.6}
+            />
         </div>
 
-        {/* Client-side Chart Components */}
-        <DashboardClientContent chartData={chartData} />
-
+        <DashboardClientContent 
+            chartData={{...chartData, funcao: chartDataFuncao}} 
+        />
 
         <div className="grid gap-6 md:grid-cols-1">
-            <Card>
+            <Card className="card-custom">
                 <CardHeader className="flex flex-row items-center">
                     <div className="grid gap-2">
-                        <CardTitle  className="flex items-center gap-2"><FileText/> Emendas Recentes ({currentYear})</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><FileText/> Emendas Recentes ({currentYear})</CardTitle>
                         <CardDescription>
                         As últimas emendas parlamentares adicionadas.
                         </CardDescription>
                     </div>
-                    <Button asChild size="sm" className="ml-auto gap-1">
+                    <Button asChild size="sm" className="ml-auto gap-1 btn-custom">
                         <Link href="/dashboard/amendments">
                         Ver Todas
                         <ArrowUpRight className="h-4 w-4" />

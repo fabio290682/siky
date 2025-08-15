@@ -116,7 +116,7 @@ export default function DashboardLayout({
                 </div>
                 <div className="flex flex-col group-data-[collapsible=icon]:hidden">
                     <span className="text-lg font-semibold tracking-tight">
-                    III Brasil
+                    Brasil
                     </span>
                 </div>
                 </div>
@@ -129,10 +129,10 @@ export default function DashboardLayout({
             </SidebarFooter>
             </Sidebar>
             <SidebarInset>
-            <header className="flex h-14 items-center justify-between border-b bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))] px-4 lg:px-6 shadow-md">
+            <header className="flex h-14 items-center justify-between border-b bg-gradient-to-r from-primary to-accent px-4 lg:px-6 shadow-md">
                 <SidebarTrigger className="md:hidden text-primary-foreground" />
-                <div className="flex-1">
-                 <h1 className="text-lg font-semibold text-primary-foreground">
+                <div className="flex-1 text-primary-foreground">
+                 <h1 className="text-lg font-semibold">
                     Dashboard
                  </h1>
                 </div>

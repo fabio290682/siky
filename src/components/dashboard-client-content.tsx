@@ -21,6 +21,8 @@ import {
   Cell,
   Legend,
   CartesianGrid,
+  Line,
+  LineChart
 } from "recharts"
 import { BarChartHorizontal, CircleDot, TrendingUp } from "lucide-react"
 
@@ -53,41 +55,40 @@ export function DashboardClientContent({ chartData }: { chartData: any }) {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="card-custom">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><BarChartHorizontal/> Execução Mensal (Empenhado vs. Pago)</CardTitle>
-                <CardDescription>Comparativo de valores ao longo de {new Date().getFullYear()}</CardDescription>
+                <CardTitle className="flex items-center gap-2 text-base">Execução Mensal (Empenhado vs. Pago)</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
-                <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={chartData.monthly}>
+                <ResponsiveContainer width="100%" height={250}>
+                   <LineChart data={chartData.monthly}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrencyShort(Number(value))} />
+                        <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => String(value)} />
                         <Tooltip
                             cursor={{ fill: 'hsl(var(--muted))' }}
                             formatter={(value: number) => formatCurrency(value)}
                         />
-                        <Legend iconType="circle" />
-                        <Bar dataKey="Empenhado" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="Pago" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
+                        <Legend iconType="rect" />
+                        <Line type="monotone" dataKey="Empenhado" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="Pago" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} />
+                    </LineChart>
                 </ResponsiveContainer>
             </CardContent>
         </Card>
         <Card className="card-custom">
             <CardHeader>
-                <CardTitle  className="flex items-center gap-2"><CircleDot /> Proporção Pago vs. A Pagar</CardTitle>
-                <CardDescription>Execução financeira total de {new Date().getFullYear()}</CardDescription>
+                <CardTitle  className="flex items-center gap-2 text-base">Proporção Pago vs. A Pagar</CardTitle>
+                 <CardDescription>Execução financeira total de {new Date().getFullYear()}</CardDescription>
             </CardHeader>
             <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                         <Pie
                             data={chartData.pie}
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            outerRadius={100}
-                            innerRadius={60}
+                            outerRadius={80}
+                            innerRadius={50}
                             fill="#8884d8"
                             dataKey="value"
                             label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
@@ -105,7 +106,7 @@ export function DashboardClientContent({ chartData }: { chartData: any }) {
         </Card>
         <Card className="card-custom lg:col-span-2">
           <CardHeader>
-              <CardTitle className="flex items-center gap-2"><TrendingUp/> Top 10 Funções por Valor Empenhado</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">Top 10 Funções por Valor Empenhado</CardTitle>
               <CardDescription>Principais áreas de destinação das emendas.</CardDescription>
           </CardHeader>
           <CardContent>

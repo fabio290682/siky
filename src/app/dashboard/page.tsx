@@ -38,7 +38,7 @@ const parseCurrency = (value: string) => {
 
 const KpiCard = ({ title, value, description, icon: Icon, className, delay = 0 }: { title: string, value: string, description: string, icon: React.ElementType, className?: string, delay?: number }) => (
     <div className="animate-fade-in" style={{ animationDelay: `${delay}s` }}>
-        <Card className={cn("card-custom text-white h-full transition-transform transform-gpu hover:-translate-y-1 hover:shadow-2xl", className)}>
+        <Card className={cn("card-custom text-white h-full", className)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{title}</CardTitle>
                 <Icon className="h-4 w-4 text-white/80" />
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
                 value={formatCurrency(kpiData.totalEmpenhado)}
                 description="Valor total comprometido para o ano"
                 icon={Landmark}
-                className="bg-[hsl(var(--primary))]"
+                className="bg-primary"
                 delay={0}
             />
              <KpiCard 
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
                 value={formatCurrency(kpiData.totalPago)}
                 description="Valor efetivamente transferido"
                 icon={DollarSign}
-                className="bg-[hsl(var(--accent))]"
+                className="bg-accent"
                 delay={0.2}
             />
              <KpiCard 

@@ -1,4 +1,7 @@
+import { UserProvider } from '@/context/UserContext';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
 
+<<<<<<< HEAD
 'use client';
 
 import Link from "next/link"
@@ -70,12 +73,16 @@ const UserProfile = () => {
 }
 
 export default function DashboardLayout({
+=======
+export default function Layout({
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
     <UserProvider>
+<<<<<<< HEAD
         <SidebarProvider>
         <div className="flex min-h-screen bg-background">
             <Sidebar>
@@ -111,6 +118,11 @@ export default function DashboardLayout({
             </SidebarInset>
         </div>
         </SidebarProvider>
+=======
+        <DashboardLayout>
+            {children}
+        </DashboardLayout>
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
     </UserProvider>
   )
 }

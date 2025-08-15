@@ -1,7 +1,7 @@
 
 'use server';
 
-const API_BASE_URL = 'https://legis.senado.leg.br/dadosabertos/senador';
+import { API_BASE_URL } from "@/config";
 
 export type Senator = {
     id: string;
@@ -14,6 +14,7 @@ export type Senator = {
     foto: string;
 };
 
+<<<<<<< HEAD
 async function fetchWithCache(url: string, options?: RequestInit) {
     try {
         const response = await fetch(url, { 
@@ -49,9 +50,34 @@ export async function getSenadores(): Promise<Senator[]> {
         email: p.IdentificacaoParlamentar.EmailParlamentar,
         foto: p.IdentificacaoParlamentar.UrlFotoParlamentar,
     }));
+=======
+async function fetchFromApi(endpoint: string, options?: RequestInit) {
+    const url = `${API_BASE_URL}/${endpoint}`;
+    return fetch(url, { ...options, next: { revalidate: 3600 } });
+}
+
+async function getFromApi<T>(endpoint: string, errorMessage: string, defaultValue: T): Promise<T> {
+  try {
+    const response = await fetchFromApi(endpoint);
+    if (!response.ok) {
+      console.error(`${errorMessage}. Status: ${response.status}`);
+      return defaultValue;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Falha ao buscar dados de ${endpoint}:`, error);
+    return defaultValue;
+  }
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
+}
+
+export async function getSenadores(): Promise<Senator[]> {
+  const data = await getFromApi<{ dados: Senator[] }>(`senado/senadores`, 'Erro ao buscar senadores', { dados: [] });
+  return data.dados;
 }
 
 export async function getSenador(id: string): Promise<Senator | null> {
+<<<<<<< HEAD
     const data = await fetchWithCache(`${API_BASE_URL}/${id}`);
     if (!data || !data.DetalheParlamentar?.Parlamentar) {
         return null;
@@ -68,4 +94,8 @@ export async function getSenador(id: string): Promise<Senator | null> {
         email: p.IdentificacaoParlamentar.EmailParlamentar,
         foto: p.IdentificacaoParlamentar.UrlFotoParlamentar,
     }
+=======
+    const data = await getFromApi<{dados: Senator}>(`senado/senadores/${id}`, `Erro ao buscar senador ${id}`, {dados: null});
+    return data.dados;
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
 }

@@ -1,5 +1,8 @@
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
 import Link from "next/link"
 import {
   Card,
@@ -17,9 +20,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp, CircleDot, BarChartHorizontal, Loader2 } from "lucide-react"
+import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp } from "lucide-react"
 import { getEmendas, type Emenda } from "@/services/transparencia-api"
 import { getDeputados } from "@/services/camara-api"
+<<<<<<< HEAD
 import * as React from "react"
 import {
   Bar,
@@ -35,6 +39,10 @@ import {
   CartesianGrid,
 } from "recharts"
 import { DashboardClientContent } from "@/components/dashboard-client-content"
+=======
+import { DashboardClientContent } from "@/components/dashboard-client-content";
+import { cn } from "@/lib/utils";
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -50,16 +58,42 @@ const parseCurrency = (value: string) => {
     return parseFloat(value.replace("R$ ", "").replace(/\./g, "").replace(",", "."));
 };
 
+const KpiCard = ({ title, value, description, icon: Icon, className, delay = 0 }: { title: string, value: string, description: string, icon: React.ElementType, className?: string, delay?: number }) => (
+    <div className="animate-fadeIn" style={{ animationDelay: `${delay}s` }}>
+        <Card className={cn("card-custom text-white h-full", className)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                <Icon className="h-4 w-4 text-white/80" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold text-center">{value}</div>
+                <p className="text-xs text-white/80 text-center">{description}</p>
+            </CardContent>
+        </Card>
+    </div>
+);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
 export default async function DashboardPage() {
     const currentYear = new Date().getFullYear();
 
     const [emendasData, deputadosData] = await Promise.all([
+<<<<<<< HEAD
         getEmendas({ano: currentYear, pagina: 1}),
         getDeputados()
     ]);
 
     const totalUsers = deputadosData?.dados?.length ?? 0;
+=======
+        getEmendas(currentYear),
+        getDeputados()
+    ]);
+
+    const totalUsers = deputadosData.dados.length;
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
 
     const totalValores = emendasData.reduce((acc, emenda) => {
         acc.pago += parseCurrency(emenda.valorPago);
@@ -77,6 +111,7 @@ export default async function DashboardPage() {
         recentAmendments: emendasData.slice(0, 5)
     };
 
+<<<<<<< HEAD
     const emendasPorFuncao = emendasData.reduce((acc, emenda) => {
         const funcao = emenda.funcao || 'Não informada';
         if (!acc[funcao]) {
@@ -121,5 +156,123 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClientContent kpiData={kpiData} chartData={chartData} currentYear={currentYear} />
+=======
+    const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+      name: new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', ''),
+      Empenhado: 0,
+      Pago: 0,
+    }));
+
+    emendasData.forEach((emenda) => {
+        const monthIndex = Math.floor(Math.random() * 12);
+        monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
+        monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
+    });
+
+    const chartData = {
+        monthly: monthlyData,
+        pie: [
+            { name: 'Valor Pago', value: totalValores.pago },
+            { name: 'A Pagar', value: valorALiberar > 0 ? valorALiberar : 0 }
+        ],
+        funcao: emendasData.reduce((acc, emenda) => {
+            const funcao = emenda.funcao || 'Não informada';
+            if (!acc[funcao]) {
+                acc[funcao] = { name: funcao, value: 0 };
+            }
+            acc[funcao].value += parseCurrency(emenda.valorEmpenhado);
+            return acc;
+        }, {} as Record<string, {name: string, value: number}>)
+    };
+
+    const chartDataFuncao = Object.values(chartData.funcao).sort((a,b) => b.value - a.value).slice(0, 10);
+
+  return (
+    <div className="flex flex-col gap-6 mt-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <KpiCard 
+                title={`Total Empenhado (${currentYear})`}
+                value={formatCurrency(kpiData.totalEmpenhado)}
+                description="Valor total comprometido para o ano"
+                icon={Landmark}
+                className="bg-primary"
+                delay={0}
+            />
+             <KpiCard 
+                title={`Total Pago (${currentYear})`}
+                value={formatCurrency(kpiData.totalPago)}
+                description="Valor efetivamente transferido"
+                icon={DollarSign}
+                className="bg-accent"
+                delay={0.2}
+            />
+             <KpiCard 
+                title="Saldo a Liberar"
+                value={formatCurrency(kpiData.valorALiberar)}
+                description="Restante do valor empenhado"
+                icon={TrendingUp}
+                className="bg-warning-custom"
+                delay={0.4}
+            />
+             <KpiCard 
+                title="Parlamentares Ativos"
+                value={`${kpiData.totalUsers}`}
+                description="Deputados federais em exercício"
+                icon={Users}
+                className="bg-info-custom"
+                delay={0.6}
+            />
+        </div>
+
+        <DashboardClientContent 
+            chartData={{...chartData, funcao: chartDataFuncao}} 
+        />
+
+        <div className="grid gap-6 md:grid-cols-1">
+            <Card className="card-custom">
+                <CardHeader className="flex flex-row items-center">
+                    <div className="grid gap-2">
+                        <CardTitle className="flex items-center gap-2"><FileText/> Emendas Recentes ({currentYear})</CardTitle>
+                        <CardDescription>
+                        As últimas emendas parlamentares adicionadas.
+                        </CardDescription>
+                    </div>
+                    <Button asChild size="sm" className="ml-auto gap-1 btn-custom">
+                        <Link href="/dashboard/amendments">
+                        Ver Todas
+                        <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>Número</TableHead>
+                        <TableHead>Autor</TableHead>
+                        <TableHead className="text-right">Valor Pago</TableHead>
+                    </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {kpiData.recentAmendments.length > 0 ? kpiData.recentAmendments.map((amendment: Emenda) => (
+                        <TableRow key={amendment.codigoEmenda}>
+                        <TableCell className="font-medium">{amendment.numeroEmenda}</TableCell>
+                        <TableCell className="truncate max-w-xs">{amendment.autor}</TableCell>
+                        <TableCell className="text-right">{amendment.valorPago}</TableCell>
+                        </TableRow>
+                    )) : (
+                        <TableRow>
+                        <TableCell colSpan={3} className="h-24 text-center">
+                            Nenhuma emenda encontrada para o ano de {currentYear}.
+                        </TableCell>
+                        </TableRow>
+                    )}
+                    </TableBody>
+                </Table>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
+>>>>>>> c1740fb8823cf88967e2c55b5a93f55bccf0fd31
   )
 }

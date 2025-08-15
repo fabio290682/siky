@@ -3,7 +3,7 @@
 
 // NOTE: The API key needs to be configured in your environment variables.
 // You can get a key from: https://portaldatransparencia.gov.br/api-de-dados
-const API_KEY = process.env.TRANSPARENCIA_API_KEY;
+const API_KEY = "99f10a688a8421cf108943301d711160";
 const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
 
 if (!API_KEY) {

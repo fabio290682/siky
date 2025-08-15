@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SlidersHorizontal, ArrowUpRight, DollarSign, Target, Landmark, Search } from "lucide-react";
+import { SlidersHorizontal, ArrowUpRight, DollarSign, Target, Landmark, Search, Database } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
@@ -108,27 +108,39 @@ export default function SiopPage() {
           <CardTitle>Links Úteis e Recursos</CardTitle>
           <CardDescription>Acesse os portais oficiais para informações detalhadas e dados brutos.</CardDescription>
         </CardHeader>
-        <CardContent className="grid md:grid-cols-2 gap-4">
-            <div className="p-4 border rounded-lg flex items-center justify-between">
+        <CardContent className="grid md:grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="p-4 border rounded-lg flex flex-col justify-between">
                 <div>
                     <h3 className="font-semibold">Portal do SIOP</h3>
                     <p className="text-sm text-muted-foreground">Painéis e relatórios oficiais.</p>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="mt-4">
                     <Link href="https://www.gov.br/planejamento/pt-br/assuntos/orcamento/siop" target="_blank" rel="noopener noreferrer">
                         Acessar Portal
                         <ArrowUpRight className="ml-2 h-4 w-4" />
                     </Link>
                 </Button>
             </div>
-            <div className="p-4 border rounded-lg flex items-center justify-between">
+             <div className="p-4 border rounded-lg flex flex-col justify-between">
                  <div>
                     <h3 className="font-semibold">API de Emendas</h3>
                     <p className="text-sm text-muted-foreground">Acesso para desenvolvedores.</p>
                 </div>
-                 <Button asChild variant="outline">
+                 <Button asChild variant="outline" className="mt-4">
                     <Link href="https://www.siop.planejamento.gov.br/modulo/main/static/api-explorer.html#impositivo/emendas" target="_blank" rel="noopener noreferrer">
                         Explorar API
+                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+            </div>
+            <div className="p-4 border rounded-lg flex flex-col justify-between">
+                 <div>
+                    <h3 className="font-semibold">Dados Abertos</h3>
+                    <p className="text-sm text-muted-foreground">Documentação e arquivos de dados.</p>
+                </div>
+                 <Button asChild variant="outline" className="mt-4">
+                    <Link href="https://orcamento.dados.gov.br/siopdoc/doku.php/acesso_publico:dados_abertos/" target="_blank" rel="noopener noreferrer">
+                        Ver Documentação
                         <ArrowUpRight className="ml-2 h-4 w-4" />
                     </Link>
                 </Button>

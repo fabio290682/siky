@@ -77,7 +77,6 @@ export async function getEmendas(ano: number): Promise<Emenda[]> {
                 allEmendas = allEmendas.concat(emendas);
                 pagina++;
                 // The API doesn't give a total, so we assume if we get less than the default page size (15), it's the last page.
-                // A safer check would be to see if length < page size, but let's assume 15 for now.
                 if (emendas.length < 15) { 
                     hasMore = false;
                 }

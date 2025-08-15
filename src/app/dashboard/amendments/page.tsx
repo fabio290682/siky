@@ -80,7 +80,7 @@ export default function AmendmentsPage() {
   React.useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
-      const data = await getEmendas(parseInt(selectedYear));
+      const data = await getEmendas({ano: parseInt(selectedYear)}) || [];
       setAllAmendments(data);
       setFilteredAmendments(data);
       setIsLoading(false);

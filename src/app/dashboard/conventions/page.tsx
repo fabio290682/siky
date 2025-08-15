@@ -44,7 +44,7 @@ type Convention = {
     percentualLiberado: number;
 };
 
-const staticConventions: Convention[] = [
+export const staticConventions: Convention[] = [
     {
         ano: 2023,
         numero: "947852",
@@ -284,3 +284,4 @@ export default function ConventionsPage() {
     </Card>
   );
 }
+

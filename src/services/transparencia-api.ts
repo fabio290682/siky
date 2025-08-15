@@ -3,8 +3,6 @@
 
 // NOTE: The API key needs to be configured in your environment variables.
 // You can get a key from: https://portaldatransparencia.gov.br/api-de-dados
-const API_KEY = process.env.TRANSPARENCIA_API_KEY;
-const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
 
 export interface Emenda {
     ano: number;
@@ -23,6 +21,7 @@ export interface Emenda {
 }
 
 async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number | undefined>, isArray: boolean = true): Promise<T[]> {
+    const API_KEY = process.env.TRANSPARENCIA_API_KEY;
     if (!API_KEY) {
         console.warn("Chave da API do Portal da Transparência não configurada. As chamadas à API retornarão dados vazios.");
         return [];
@@ -50,6 +49,9 @@ async function fetchFromApi<T>(endpoint: string, params: Record<string, string |
         return [];
     }
 }
+
+const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
+
 
 export async function getEmendas(params: { ano?: number; pagina?: number; autor?: string; numeroEmenda?: string }): Promise<Emenda[]> {
     const endpointParams = {

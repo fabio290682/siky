@@ -3,15 +3,6 @@
 
 // NOTE: The API key needs to be configured in your environment variables.
 // You can get a key from: https://portaldatransparencia.gov.br/api-de-dados
-<<<<<<< HEAD
-=======
-const API_KEY = "99f10a688a8421cf108943301d711160";
-const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
-
-if (!API_KEY) {
-    console.warn("Chave da API do Portal da Transparência não configurada. As chamadas à API serão desabilitadas.");
-}
->>>>>>> 6fc1fa2 ("[{"key":"chave-api-dados","value":"99f10a688a8421cf108943301d711160"}])
 
 export interface Emenda {
     ano: number;

@@ -11,7 +11,6 @@ export async function handleSummarize(input: SummarizeAmendmentsInput) {
   } catch (error) {
     console.error("Error summarizing amendments:", error)
     return { success: false, error: "Não foi possível gerar o resumo. Tente novamente." }
-<<<<<<< HEAD
   }
 }
 
@@ -33,7 +32,5 @@ export async function handleGenerateConventionsReport(filters: ConventionFilters
   } catch (error: any) {
     console.error("Error generating conventions report:", error);
     return { success: false, error: error.message || "Failed to generate conventions report." };
-=======
->>>>>>> af96cc0 (ao colocar dados da api buscar automatico em emendas e ativar tudo)
   }
 }

@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ArrowUpRight, DollarSign, Users, Landmark, FileText, TrendingUp, CircleDot, BarChartHorizontal } from "lucide-react"
+import { ArrowUpRight, DollarSign, Users, Landmark, FileText } from "lucide-react"
 import { getEmendas, type Emenda } from "@/services/transparencia-api"
 import { getDeputados } from "@/services/camara-api"
 import { DashboardClientContent } from "@/components/dashboard-client-content";
@@ -37,15 +37,15 @@ const parseCurrency = (value: string) => {
 };
 
 const KpiCard = ({ title, value, description, icon: Icon, className, delay = 0 }: { title: string, value: string, description: string, icon: React.ElementType, className?: string, delay?: number }) => (
-    <div className="animate-fade-in" style={{ animationDelay: `${delay}s` }}>
+    <div className="animate-fadeIn" style={{ animationDelay: `${delay}s` }}>
         <Card className={cn("card-custom text-white h-full", className)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{title}</CardTitle>
                 <Icon className="h-4 w-4 text-white/80" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{value}</div>
-                <p className="text-xs text-white/80">{description}</p>
+                <div className="text-2xl font-bold text-center">{value}</div>
+                <p className="text-xs text-white/80 text-center">{description}</p>
             </CardContent>
         </Card>
     </div>
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
     const chartDataFuncao = Object.values(chartData.funcao).sort((a,b) => b.value - a.value).slice(0, 10);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 mt-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <KpiCard 
                 title={`Total Empenhado (${currentYear})`}

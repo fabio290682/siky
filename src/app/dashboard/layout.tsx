@@ -1,148 +1,16 @@
+import { UserProvider } from '@/context/UserContext';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
 
-'use client';
-
-import Link from "next/link"
-import React from 'react';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarTrigger,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { LogOut, Settings, User } from "lucide-react"
-import { SidebarNav } from "@/components/sidebar-nav"
-import { UserProvider, useUser } from '@/context/UserContext';
-
-
-const AppLogo = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M13.125 10.5L10.5 7.875L7.875 10.5L10.5 13.125L13.125 10.5Z" />
-      <path d="M7 4C5.89543 4 5 4.89543 5 6V7C5 7.55228 5.44772 8 6 8H7C7.55228 8 8 7.55228 8 7V6C8 4.89543 6.90457 4 6 4C4.89543 4 4 4.89543 4 6V15C4 16.1046 4.89543 17 6 17H7C7.55228 17 8 16.5523 8 16V14.5" />
-      <path d="M17 4C18.1046 4 19 4.89543 19 6V7C19 7.55228 18.5523 8 18 8H17C16.4477 8 16 7.55228 16 7V6C16 4.89543 17.0954 4 18 4C19.1046 4 20 4.89543 20 6V15C20 16.1046 19.1046 17 18 17H17C16.4477 17 16 16.5523 16 16V14.5" />
-    </svg>
-  );
-
-const UserProfile = () => {
-    const { user } = useUser();
-    const nameInitials = user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'P';
-
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-14 w-full justify-start p-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:justify-center">
-                <Avatar className="h-8 w-8">
-                <AvatarImage src="https://placehold.co/40x40.png" alt="User" data-ai-hint="avatar" />
-                <AvatarFallback>{nameInitials}</AvatarFallback>
-                </Avatar>
-                <div className="ml-3 flex flex-col items-start group-data-[collapsible=icon]:hidden">
-                <span className="text-sm font-medium">{user.name}</span>
-                <span className="text-xs text-muted-foreground">
-                    {user.email}
-                </span>
-                </div>
-            </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start" className="w-56">
-            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link href="/dashboard/profile">
-                <User className="mr-2 h-4 w-4" />
-                <span>Perfil</span>
-                </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Configurações</span>
-                </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link href="/">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-                </Link>
-            </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
-}
-
-export default function DashboardLayout({
+export default function Layout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
     <UserProvider>
-        <SidebarProvider>
-        <div className="flex min-h-screen bg-background">
-            <Sidebar>
-            <SidebarHeader className="p-4">
-                <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 text-primary">
-                    <AppLogo />
-                </div>
-                <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                    <span className="text-lg font-semibold tracking-tight">
-                    Brasil
-                    </span>
-                </div>
-                </div>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarNav />
-            </SidebarContent>
-            <SidebarFooter>
-                <UserProfile />
-            </SidebarFooter>
-            </Sidebar>
-            <SidebarInset>
-            <header className="flex h-14 items-center justify-between border-b bg-gradient-to-r from-primary to-accent px-4 lg:px-6 shadow-md">
-                <SidebarTrigger className="md:hidden text-primary-foreground" />
-                <div className="flex-1 text-primary-foreground">
-                 <h1 className="text-lg font-semibold">
-                    Dashboard
-                 </h1>
-                </div>
-            </header>
-            <main className="flex-1 overflow-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900/20">
-                {children}
-            </main>
-            </SidebarInset>
-        </div>
-        </SidebarProvider>
+        <DashboardLayout>
+            {children}
+        </DashboardLayout>
     </UserProvider>
   )
 }

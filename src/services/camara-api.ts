@@ -152,96 +152,53 @@ interface FrentesResponse {
 }
 
 async function fetchWithCache(url: string, options?: RequestInit) {
-    return fetch(url, { ...options, next: { revalidate: 3600 } });
+    try {
+        const response = await fetch(url, { ...options, next: { revalidate: 3600 } });
+        if (!response.ok) {
+            console.error(`API Error: ${response.status} ${await response.text()}`);
+            return null;
+        }
+        return response.json();
+    } catch(error) {
+        console.error(`Fetch Error for ${url}:`, error);
+        return null;
+    }
 }
 
 
 export async function getDeputados(params?: URLSearchParams): Promise<DeputadosResponse> {
   const url = `${API_BASE_URL}/deputados?${params?.toString() || ''}`;
-  try {
-    const response = await fetchWithCache(url);
-    if (!response.ok) {
-      throw new Error('Erro ao buscar deputados');
-    }
-    const data: DeputadosResponse = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Falha ao buscar dados dos deputados:', error);
-    return { dados: [], links: [] };
-  }
+  const data = await fetchWithCache(url);
+  return data || { dados: [], links: [] };
 }
 
 export async function getDeputadoDetalhes(id: number): Promise<DeputadoDetalhesResponse> {
-    try {
-        const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}`);
-        if (!response.ok) {
-            throw new Error(`Erro ao buscar detalhes do deputado: ${id}`);
-        }
-        const data: DeputadoDetalhesResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Falha ao buscar dados do deputado ${id}:`, error);
-        throw error;
-    }
+    const data = await fetchWithCache(`${API_BASE_URL}/deputados/${id}`);
+    if (!data) throw new Error(`Failed to fetch details for deputy ${id}`);
+    return data;
 }
 
 export async function getDeputadoDespesas(id: number): Promise<DespesasResponse> {
-    try {
-        const url = `${API_BASE_URL}/deputados/${id}/despesas?ordem=DESC&ordenarPor=ano&itens=100`;
-        const response = await fetchWithCache(url);
-        if (!response.ok) {
-            console.error(`Erro ao buscar despesas do deputado: ${id}. Status: ${response.status}`);
-            return { dados: [], links: [] };
-        }
-        const data: DespesasResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Falha ao buscar despesas do deputado ${id}:`, error);
-        return { dados: [], links: [] };
-    }
+    const url = `${API_BASE_URL}/deputados/${id}/despesas?ordem=DESC&ordenarPor=ano&itens=100`;
+    const data = await fetchWithCache(url);
+    return data || { dados: [], links: [] };
 }
 
 export async function getDeputadoOrgaos(id: number): Promise<OrgaosResponse> {
-    try {
-        const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}/orgaos?ordem=ASC&ordenarPor=nomeOrgao`);
-        if (!response.ok) {
-            console.error(`Erro ao buscar órgãos do deputado: ${id}. Status: ${response.status}`);
-            return { dados: [], links: [] };
-        }
-        const data: OrgaosResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Falha ao buscar órgãos do deputado ${id}:`, error);
-        return { dados: [], links: [] };
-    }
+    const url = `${API_BASE_URL}/deputados/${id}/orgaos?ordem=ASC&ordenarPor=nomeOrgao`;
+    const data = await fetchWithCache(url);
+    return data || { dados: [], links: [] };
 }
 
 export async function getDeputadoFrentes(id: number): Promise<FrentesResponse> {
-    try {
-        const response = await fetchWithCache(`${API_BASE_URL}/deputados/${id}/frentes`);
-        if (!response.ok) {
-            console.error(`Erro ao buscar frentes do deputado: ${id}. Status: ${response.status}`);
-            return { dados: [], links: [] };
-        }
-        const data: FrentesResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Falha ao buscar frentes do deputado ${id}:`, error);
-        return { dados: [], links: [] };
-    }
+    const url = `${API_BASE_URL}/deputados/${id}/frentes`;
+    const data = await fetchWithCache(url);
+    return data || { dados: [], links: [] };
 }
 
 
 export async function getPartidos(): Promise<PartidosResponse> {
-    try {
-        const response = await fetchWithCache(`${API_BASE_URL}/partidos?itens=100&ordem=ASC&ordenarPor=sigla`);
-        if (!response.ok) {
-            throw new Error('Erro ao buscar partidos');
-        }
-        const data: PartidosResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Falha ao buscar dados dos partidos:', error);
-        return { dados: [], links: [] };
-    }
+    const url = `${API_BASE_URL}/partidos?itens=100&ordem=ASC&ordenarPor=sigla`;
+    const data = await fetchWithCache(url);
+    return data || { dados: [], links: [] };
 }

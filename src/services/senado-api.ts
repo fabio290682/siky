@@ -15,20 +15,28 @@ export type Senator = {
 };
 
 async function fetchWithCache(url: string, options?: RequestInit) {
-    return fetch(url, { ...options, next: { revalidate: 3600 } });
+    try {
+        const response = await fetch(url, { 
+            ...options, 
+            next: { revalidate: 3600 },
+            headers: { 'Accept': 'application/json', ...options?.headers }
+        });
+        if (!response.ok) {
+            console.error(`API Error: ${response.status} ${await response.text()}`);
+            return null;
+        }
+        return response.json();
+    } catch(error) {
+        console.error(`Fetch Error for ${url}:`, error);
+        return null;
+    }
 }
 
 export async function getSenadores(): Promise<Senator[]> {
-  try {
-    const response = await fetchWithCache(`${API_BASE_URL}/lista/atual`, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-    if (!response.ok) {
-      throw new Error('Erro ao buscar senadores');
+    const data = await fetchWithCache(`${API_BASE_URL}/lista/atual`);
+    if (!data || !data.ListaParlamentarEmExercicio?.Parlamentares?.Parlamentar) {
+        return [];
     }
-    const data = await response.json();
     const parlamentares = data.ListaParlamentarEmExercicio.Parlamentares.Parlamentar;
 
     return parlamentares.map((p: any) => ({
@@ -41,37 +49,23 @@ export async function getSenadores(): Promise<Senator[]> {
         email: p.IdentificacaoParlamentar.EmailParlamentar,
         foto: p.IdentificacaoParlamentar.UrlFotoParlamentar,
     }));
-  } catch (error) {
-    console.error('Falha ao buscar dados dos senadores:', error);
-    return [];
-  }
 }
 
 export async function getSenador(id: string): Promise<Senator | null> {
-    try {
-      const response = await fetchWithCache(`${API_BASE_URL}/${id}`, {
-          headers: {
-              'Accept': 'application/json'
-          }
-      });
-      if (!response.ok) {
-        throw new Error(`Erro ao buscar senador: ${id}`);
-      }
-      const data = await response.json();
-      const p = data.DetalheParlamentar.Parlamentar;
-  
-      return {
-          id: p.IdentificacaoParlamentar.CodigoParlamentar,
-          nome: p.IdentificacaoParlamentar.NomeParlamentar,
-          partido: p.IdentificacaoParlamentar.SiglaPartidoParlamentar,
-          uf: p.IdentificacaoParlamentar.UfParlamentar,
-          periodo: `${p.Mandato.PrimeiraLegislaturaDoMandato.NumeroLegislatura} - ${p.Mandato.SegundaLegislaturaDoMandato.NumeroLegislatura}`,
-          telefones: p.Telefones?.Telefone.find((t:any) => t.TipoTelefone === 'Gabinete')?.NumeroTelefone || 'Não informado',
-          email: p.IdentificacaoParlamentar.EmailParlamentar,
-          foto: p.IdentificacaoParlamentar.UrlFotoParlamentar,
-      }
-    } catch (error) {
-      console.error(`Falha ao buscar dados do senador ${id}:`, error);
-      return null;
+    const data = await fetchWithCache(`${API_BASE_URL}/${id}`);
+    if (!data || !data.DetalheParlamentar?.Parlamentar) {
+        return null;
     }
-  }
+    const p = data.DetalheParlamentar.Parlamentar;
+  
+    return {
+        id: p.IdentificacaoParlamentar.CodigoParlamentar,
+        nome: p.IdentificacaoParlamentar.NomeParlamentar,
+        partido: p.IdentificacaoParlamentar.SiglaPartidoParlamentar,
+        uf: p.IdentificacaoParlamentar.UfParlamentar,
+        periodo: `${p.Mandato.PrimeiraLegislaturaDoMandato.NumeroLegislatura} - ${p.Mandato.SegundaLegislaturaDoMandato.NumeroLegislatura}`,
+        telefones: p.Telefones?.Telefone.find((t:any) => t.TipoTelefone === 'Gabinete')?.NumeroTelefone || 'Não informado',
+        email: p.IdentificacaoParlamentar.EmailParlamentar,
+        foto: p.IdentificacaoParlamentar.UrlFotoParlamentar,
+    }
+}

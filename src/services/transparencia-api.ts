@@ -57,9 +57,14 @@ async function fetchFromApi<T>(endpoint: string, params: Record<string, string |
     }
 }
 
-
-export async function getEmendas(ano: number, pagina: number = 1): Promise<Emenda[]> {
-    return fetchFromApi<Emenda>('emendas', { ano, pagina }, true) as Promise<Emenda[]>;
+export async function getEmendas(params: { ano?: number; pagina?: number; autor?: string; numeroEmenda?: string }): Promise<Emenda[]> {
+    const endpointParams = {
+        ano: params.ano,
+        pagina: params.pagina || 1,
+        autor: params.autor,
+        numeroEmenda: params.numeroEmenda
+    };
+    return fetchFromApi<Emenda>('emendas', endpointParams, true) as Promise<Emenda[]>;
 }
 
 export async function getEmendaDetail(codigo: string): Promise<Emenda | null> {

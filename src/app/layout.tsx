@@ -3,7 +3,7 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'III Brasil',
+  title: 'IntegraGov',
   description: 'Tecnologia que conecta e transforma.',
 };
 

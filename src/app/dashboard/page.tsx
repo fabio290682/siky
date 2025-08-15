@@ -80,7 +80,7 @@ export default function DashboardPage() {
                 getDeputados()
             ]);
 
-            const totalUsers = deputadosData.dados.length;
+            const totalUsers = deputadosData?.dados?.length ?? 0;
 
             const totalValores = emendasData.reduce((acc, emenda) => {
                 acc.pago += parseCurrency(emenda.valorPago);
@@ -118,7 +118,8 @@ export default function DashboardPage() {
             }));
 
             emendasData.forEach((emenda, index) => {
-                const monthIndex = index % 12;
+                // This is a mock distribution, replace with actual date parsing if available
+                const monthIndex = Math.floor(Math.random() * 12);
                 monthlyData[monthIndex].Empenhado += parseCurrency(emenda.valorEmpenhado);
                 monthlyData[monthIndex].Pago += parseCurrency(emenda.valorPago);
             });
@@ -138,10 +139,19 @@ export default function DashboardPage() {
         fetchData();
     }, [currentYear]);
 
-    if (isLoading || !kpiData || !chartData) {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+    
+    if (!kpiData || !chartData) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+                <p className="text-xl text-muted-foreground">Não foi possível carregar os dados do dashboard.</p>
+                <p className="text-sm text-muted-foreground">Verifique a configuração da chave de API do Portal da Transparência.</p>
             </div>
         )
     }

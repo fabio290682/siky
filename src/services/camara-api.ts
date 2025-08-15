@@ -158,7 +158,7 @@ async function fetchWithCache(url: string, options?: RequestInit) {
 
 export async function getDeputados(): Promise<DeputadosResponse> {
   try {
-    const response = await fetchWithCache(`${API_BASE_URL}/deputados?ordem=ASC&ordenarPor=nome&itens=100`);
+    const response = await fetchWithCache(`${API_BASE_URL}/deputados?ordem=ASC&ordenarPor=nome`);
     if (!response.ok) {
       throw new Error('Erro ao buscar deputados');
     }

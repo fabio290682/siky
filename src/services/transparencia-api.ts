@@ -6,10 +6,6 @@
 const API_KEY = process.env.TRANSPARENCIA_API_KEY;
 const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
 
-if (!API_KEY) {
-    console.warn("Chave da API do Portal da Transparência não configurada. As chamadas à API serão desabilitadas.");
-}
-
 export interface Emenda {
     ano: number;
     autor: string;
@@ -28,6 +24,7 @@ export interface Emenda {
 
 async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number | undefined>, isArray: boolean = true): Promise<T[]> {
     if (!API_KEY) {
+        console.warn("Chave da API do Portal da Transparência não configurada. As chamadas à API retornarão dados vazios.");
         return [];
     }
     const url = new URL(`${API_BASE_URL}/${endpoint}`);

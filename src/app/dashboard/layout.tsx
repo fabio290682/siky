@@ -59,10 +59,10 @@ const UserProfile = () => {
                     </div>
                 </Link>
             </Button>
-            <Button variant="destructive" size="sm" className="w-full group-data-[collapsible=icon]:hidden" asChild>
+            <Button variant="destructive" className="w-full justify-start group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-10" asChild>
                  <Link href="/">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair</span>
+                    <LogOut />
+                    <span className="group-data-[collapsible=icon]:hidden ml-2">Sair</span>
                 </Link>
             </Button>
         </div>

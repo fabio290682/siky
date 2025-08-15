@@ -20,12 +20,15 @@ export interface Emenda {
     valorRestoAPagar: string;
 }
 
+const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
+
 async function fetchFromApi<T>(endpoint: string, params: Record<string, string | number | undefined>, isArray: boolean = true): Promise<T[]> {
     const API_KEY = process.env.TRANSPARENCIA_API_KEY;
     if (!API_KEY) {
         console.warn("Chave da API do Portal da Transparência não configurada. As chamadas à API retornarão dados vazios.");
         return [];
     }
+    
     const url = new URL(`${API_BASE_URL}/${endpoint}`);
     Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) url.searchParams.append(key, String(value));
@@ -49,8 +52,6 @@ async function fetchFromApi<T>(endpoint: string, params: Record<string, string |
         return [];
     }
 }
-
-const API_BASE_URL = 'https://api.portaldatransparencia.gov.br/api-de-dados';
 
 
 export async function getEmendas(params: { ano?: number; pagina?: number; autor?: string; numeroEmenda?: string }): Promise<Emenda[]> {

@@ -34,38 +34,20 @@ class TransparenciaService {
       codigoEmenda,
     } = params;
 
-    let allEmendas: any[] = [];
-    let currentPage = pagina;
-    let hasMore = true;
-
-    while (hasMore) {
-        const queryParams = new URLSearchParams({ ano, pagina: currentPage.toString() });
-        if (codigoEmenda) queryParams.set('codigoEmenda', codigoEmenda);
-        
-        const url = `${BASE_URL}/emendas?${queryParams.toString()}`;
-        
-        try {
-            const data = await fetchWithRetry(url, { headers: this.getHeaders() });
-            if (data && data.length > 0) {
-                allEmendas = allEmendas.concat(data);
-                if (data.length < 15) { // API default page size is 15
-                    hasMore = false;
-                } else {
-                    currentPage++;
-                }
-            } else {
-                hasMore = false;
-            }
-        } catch (error) {
-            console.error(`Erro ao buscar emendas na página ${currentPage}:`, error);
-            hasMore = false; // Stop on error
-        }
-        if (currentPage > 200) { // Safety break
-             console.warn("Atingido o limite de 200 páginas na busca de emendas.");
-             hasMore = false;
-        }
+    const queryParams = new URLSearchParams({ ano, pagina: pagina.toString() });
+    if (codigoEmenda) queryParams.set('codigoEmenda', codigoEmenda);
+    
+    const url = `${BASE_URL}/emendas?${queryParams.toString()}`;
+    
+    try {
+        console.log(`Buscando emendas para o ano ${ano}, página ${pagina}...`);
+        const data = await fetchWithRetry(url, { headers: this.getHeaders() });
+        console.log(`Busca finalizada. Total de ${data?.length || 0} emendas encontradas para ${ano}.`);
+        return data || [];
+    } catch (error) {
+        console.error(`Erro ao buscar emendas na página ${pagina}:`, error);
+        return []; // Retorna array vazio em caso de erro para não quebrar o cliente
     }
-    return allEmendas;
   }
 
   async getConvenios(params: ConvenioParams = {}) {

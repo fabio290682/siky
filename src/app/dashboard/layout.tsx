@@ -9,14 +9,6 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
   SidebarProvider,
   Sidebar,
   SidebarHeader,
@@ -24,12 +16,9 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { LogOut, Settings, User } from "lucide-react"
+import { LogOut } from "lucide-react"
 import { SidebarNav } from "@/components/sidebar-nav"
 import { UserProvider, useUser } from '@/context/UserContext';
 
@@ -57,45 +46,26 @@ const UserProfile = () => {
     const nameInitials = user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'P';
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-14 w-full justify-start p-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:justify-center">
-                <Avatar className="h-8 w-8">
-                <AvatarImage src="https://placehold.co/40x40.png" alt="User" data-ai-hint="avatar" />
-                <AvatarFallback>{nameInitials}</AvatarFallback>
-                </Avatar>
-                <div className="ml-3 flex flex-col items-start group-data-[collapsible=icon]:hidden">
-                <span className="text-sm font-medium">{user.name}</span>
-                <span className="text-xs text-muted-foreground">
-                    {user.email}
-                </span>
-                </div>
-            </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start" className="w-56">
-            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
+        <div className="flex flex-col gap-2">
+             <Button variant="ghost" className="h-14 w-full justify-start p-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:justify-center" asChild>
                 <Link href="/dashboard/profile">
-                <User className="mr-2 h-4 w-4" />
-                <span>Perfil</span>
+                    <Avatar className="h-8 w-8">
+                        <AvatarImage src="https://placehold.co/40x40.png" alt="User" data-ai-hint="avatar" />
+                        <AvatarFallback>{nameInitials}</AvatarFallback>
+                    </Avatar>
+                    <div className="ml-3 flex flex-col items-start group-data-[collapsible=icon]:hidden">
+                        <span className="text-sm font-medium">{user.name}</span>
+                        <span className="text-xs text-muted-foreground">Ver Perfil</span>
+                    </div>
                 </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Configurações</span>
+            </Button>
+            <Button variant="destructive" size="sm" className="w-full group-data-[collapsible=icon]:hidden" asChild>
+                 <Link href="/">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
                 </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link href="/">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-                </Link>
-            </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+            </Button>
+        </div>
     )
 }
 

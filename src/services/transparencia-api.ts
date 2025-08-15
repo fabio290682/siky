@@ -1,6 +1,5 @@
 
 'use server';
-import 'dotenv/config';
 
 // NOTE: The API key needs to be configured in your environment variables.
 // You can get a key from: https://portaldatransparencia.gov.br/api-de-dados

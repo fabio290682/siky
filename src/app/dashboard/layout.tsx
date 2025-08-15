@@ -116,7 +116,7 @@ export default function DashboardLayout({
                 </div>
                 <div className="flex flex-col group-data-[collapsible=icon]:hidden">
                     <span className="text-lg font-semibold tracking-tight">
-                    III Brasil
+                    IntegraGov
                     </span>
                 </div>
                 </div>
